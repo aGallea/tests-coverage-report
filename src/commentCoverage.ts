@@ -149,6 +149,12 @@ const buildDiffCoverHtml = (eventInfo: EventInfo, diffsInfo: DiffInfo[]) => {
       }
       html += `<tr><td>Total</td><td>${totalCovered}/${totalLines}</td><td>${totalPercentage}%</td><td></td></tr>`;
       html += '</table></details>';
+      if (
+        eventInfo.failUnderCoveragePercentage &&
+        totalPercentage < +eventInfo.minCoveragePercentage
+      ) {
+        core.setFailed('low coverage');
+      }
       return (
         `### Coverage Details ${
           totalPercentage > +eventInfo.minCoveragePercentage

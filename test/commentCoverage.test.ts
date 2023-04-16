@@ -1,8 +1,9 @@
-import { defaultData, spyActions } from './actions.spy';
+import { spyActions } from './actions.spy';
 import * as github from '@actions/github';
 import { DiffInfo, EventInfo, Junit } from '../src/types';
 import { getEventInfo } from '../src/eventInfo';
 import { buildBody, commentCoverage } from '../src/commentCoverage';
+import * as core from '@actions/core';
 
 const originalContext = { ...github.context };
 
@@ -240,6 +241,25 @@ describe('commentCoverage tests', () => {
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
         '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Lines Covered</th><th>Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
       );
+    });
+    test('diffCover content with missed range and failUnder', async () => {
+      eventInfo.showDiffcover = true;
+      eventInfo.failUnderCoveragePercentage = false;
+      diffsInfo.push({
+        file: '2.file',
+        changedLines: ['1', '2', '3', '4', '5', '6'],
+        missedLines: ['1', '2', '3', '5'],
+      });
+      const coreSetFailedSpy = jest.spyOn(core, 'setFailed');
+      expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Lines Covered</th><th>Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
+      );
+      expect(coreSetFailedSpy).not.toHaveBeenCalled();
+      eventInfo.failUnderCoveragePercentage = true;
+      expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Lines Covered</th><th>Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
+      );
+      expect(coreSetFailedSpy).toHaveBeenCalledWith('low coverage');
     });
   });
 });
