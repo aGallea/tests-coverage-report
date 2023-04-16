@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aGallea/cover-report.git"
+    "url": "git+https://github.com/aGallea/tests-coverage-report.git"
   },
   "keywords": [
     "coverage",
@@ -33,9 +33,9 @@
   "author": "Asaf Gallea",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/aGallea/cover-report/issues"
+    "url": "https://github.com/aGallea/tests-coverage-report/issues"
   },
-  "homepage": "https://github.com/aGallea/cover-report#readme",
+  "homepage": "https://github.com/aGallea/tests-coverage-report#readme",
   "devDependencies": {
     "semantic-release": "^21.0.1",
     "@semantic-release/changelog": "^6.0.3",
