@@ -1,0 +1,71 @@
+name: Tests Cover Report
+description: todo
+branding:
+  icon: archive
+  color: purple
+
+inputs:
+  github-token:
+    description: GitHub API Access Token
+    default: ${{ github.token }}
+    required: true
+  title:
+    description: Title for the comment
+    default: Tests Report
+    required: false
+  cobertura-path:
+    description: The location of the cobertura coverage xml file
+    default: ./coverage/cobertura-coverage.xml
+    required: false
+  clover-path:
+    description: The location of the clover coverage xml file
+    default: ./coverage/clover.xml
+    required: false
+  lcov-path:
+    description: The location of the lcov coverage info file
+    default: ./coverage/lcov.info
+    required: false
+  jacoco-path:
+    description: The location of the jacoco coverage xml file
+    default: ./target/site/jacoco/jacoco.xml
+    required: false
+  junit-path:
+    description: The location of the junit xml file
+    default: ./coverage/junit.xml
+    required: false
+  show-junit:
+    description: Show JUnit details on comment
+    default: 'true'
+    required: false
+  diffcover-ref:
+    description: Diff coverage report referral
+    default: cobertura
+    required: false
+  show-diffcover:
+    description: Show coverage report details on comment
+    default: 'true'
+    required: false
+  min-coverage-percentage:
+    description: Minimum coverage percentage
+    default: '80'
+    required: false
+  fail-under-coverage-percentage:
+    description: Fail job when coverage percentage is below the minimum
+    default: 'true'
+    required: false
+  show-failures-info:
+    description: Show failures info on comment
+    default: 'false'
+    required: false
+  override-comment:
+    description: Overrides existing coverage comment
+    default: 'true'
+    required: false
+
+outputs:
+  coverage:
+    description: Value indicating the coverage percentage of your report based on Jest, example 78
+
+runs:
+  using: node16
+  main: dist/index.js

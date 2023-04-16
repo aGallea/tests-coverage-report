@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Tests With Coverage Report
+concurrency:
+  group: Tests-Coverage-Report-${{ github.head_ref }}
+  cancel-in-progress: true
+on:
+  workflow_dispatch: null
+  pull_request: null
+jobs:
+  tests-with-coverage:
+    timeout-minutes: 5
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint And Build
+      run: npm run build
+
+    - name: Run Tests
+      run: npm run test
+
+    - name: Coverage Report
+      if: always()
+      uses: aGallea/tests-coverage-report@master

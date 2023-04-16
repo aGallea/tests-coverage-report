@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="50" failures="2" errors="0" time="6.176">
+  <testsuite name="jacoco parser tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="4.551" tests="5">
+    <testcase classname="jacoco parser tests No such file" name="jacoco parser tests No such file" time="0.002">
+    </testcase>
+    <testcase classname="jacoco parser tests Filename empty string" name="jacoco parser tests Filename empty string" time="0.001">
+    </testcase>
+    <testcase classname="jacoco parser tests Invalid xml content" name="jacoco parser tests Invalid xml content" time="0.019">
+    </testcase>
+    <testcase classname="jacoco parser tests error xml content" name="jacoco parser tests error xml content" time="0.004">
+    </testcase>
+    <testcase classname="jacoco parser tests Parse" name="jacoco parser tests Parse" time="0.012">
+    </testcase>
+  </testsuite>
+  <testsuite name="clover parser tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="4.61" tests="5">
+    <testcase classname="clover parser tests No such file" name="clover parser tests No such file" time="0.002">
+    </testcase>
+    <testcase classname="clover parser tests Filename empty string" name="clover parser tests Filename empty string" time="0.001">
+    </testcase>
+    <testcase classname="clover parser tests Invalid xml content" name="clover parser tests Invalid xml content" time="0.011">
+    </testcase>
+    <testcase classname="clover parser tests error xml content" name="clover parser tests error xml content" time="0.01">
+    </testcase>
+    <testcase classname="clover parser tests Parse" name="clover parser tests Parse" time="0.07">
+    </testcase>
+  </testsuite>
+  <testsuite name="junit parser tests" errors="0" failures="2" skipped="0" timestamp="2023-04-13T10:26:48" time="4.619" tests="5">
+    <testcase classname="junit parser tests No such file" name="junit parser tests No such file" time="0.002">
+    </testcase>
+    <testcase classname="junit parser tests Filename empty string" name="junit parser tests Filename empty string" time="0">
+    </testcase>
+    <testcase classname="junit parser tests Invalid xml content" name="junit parser tests Invalid xml content" time="0.011">
+    </testcase>
+    <testcase classname="junit parser tests error xml content" name="junit parser tests error xml content" time="0.039">
+      <failure>Error: expect(received).rejects.toThrow(expected)
+
+Expected substring: &quot;Non-whitespace before first tag.
+Line: 0
+Column: 1
+Char: s1&quot;
+Received message:   &quot;Non-whitespace before first tag.
+Line: 0
+Column: 1
+Char: s&quot;
+
+      43 | const parseContent = (xml: string): Promise&lt;Junit&gt; =&gt; {
+      44 |   return new Promise((resolve, reject) =&gt; {
+    &gt; 45 |     parseString.parseString(xml, (err, parseResult) =&gt; {
+         |                 ^
+      46 |       if (err) {
+      47 |         return reject(err);
+      48 |       }
+
+      at error (node_modules/sax/lib/sax.js:651:10)
+      at strictFail (node_modules/sax/lib/sax.js:677:7)
+      at beginWhiteSpace (node_modules/sax/lib/sax.js:951:7)
+      at SAXParser.write (node_modules/sax/lib/sax.js:1006:11)
+      at Parser.Object.&lt;anonymous&gt;.exports.Parser.Parser.parseString (node_modules/xml2js/lib/parser.js:323:31)
+      at Parser.parseString (node_modules/xml2js/lib/parser.js:5:59)
+      at Object.&lt;anonymous&gt;.exports.parseString (node_modules/xml2js/lib/parser.js:369:19)
+      at src/parsers/junit.ts:45:17
+      at parseContent (src/parsers/junit.ts:44:10)
+      at src/parsers/junit.ts:73:34
+    at Object.toThrow (/Users/user/workspace/private/tests-coverage-report/node_modules/expect/build/index.js:210:22)
+    at Object.&lt;anonymous&gt; (/Users/user/workspace/private/tests-coverage-report/test/parsers/junit.test.ts:18:76)
+    at Promise.then.completed (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/utils.js:289:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/utils.js:222:10)
+    at _callCircusTest (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/run.js:248:40)
+    at _runTest (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/run.js:184:3)
+    at _runTestsForDescribeBlock (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/run.js:86:9)
+    at _runTestsForDescribeBlock (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/run.js:81:9)
+    at run (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/run.js:26:3)
+    at runAndTransformResultsToJestFormat (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:120:21)
+    at jestAdapter (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/user/workspace/private/tests-coverage-report/node_modules/jest-runner/build/testWorker.js:106:12)</failure>
+    </testcase>
+    <testcase classname="junit parser tests Parse" name="junit parser tests Parse" time="0.007">
+      <failure>Error: expect(received).toEqual(expected) // deep equality
+
+Expected: &quot;11.57s&quot;
+Received: &quot;1.57s&quot;
+    at Object.&lt;anonymous&gt; (/Users/user/workspace/private/tests-coverage-report/test/parsers/junit.test.ts:27:26)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="cobertura parser tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="4.639" tests="5">
+    <testcase classname="cobertura parser tests No such file" name="cobertura parser tests No such file" time="0.002">
+    </testcase>
+    <testcase classname="cobertura parser tests Filename empty string" name="cobertura parser tests Filename empty string" time="0.001">
+    </testcase>
+    <testcase classname="cobertura parser tests Invalid xml content" name="cobertura parser tests Invalid xml content" time="0.012">
+    </testcase>
+    <testcase classname="cobertura parser tests error xml content" name="cobertura parser tests error xml content" time="0.017">
+    </testcase>
+    <testcase classname="cobertura parser tests Parse" name="cobertura parser tests Parse" time="0.083">
+    </testcase>
+  </testsuite>
+  <testsuite name="eventInput tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="4.769" tests="1">
+    <testcase classname="eventInput tests getChangedFiles" name="eventInput tests getChangedFiles" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="commentCoverage tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="4.799" tests="13">
+    <testcase classname="commentCoverage tests commentCoverage tests createCommitComment with push event" name="commentCoverage tests commentCoverage tests createCommitComment with push event" time="0.002">
+    </testcase>
+    <testcase classname="commentCoverage tests commentCoverage tests createComment with pull_request event" name="commentCoverage tests commentCoverage tests createComment with pull_request event" time="0">
+    </testcase>
+    <testcase classname="commentCoverage tests commentCoverage tests createComment with pull_request event and overrideComment" name="commentCoverage tests commentCoverage tests createComment with pull_request event and overrideComment" time="0.001">
+    </testcase>
+    <testcase classname="commentCoverage tests commentCoverage tests updateComment with pull_request event and overrideComment" name="commentCoverage tests commentCoverage tests updateComment with pull_request event and overrideComment" time="0.001">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests dont show junit and diffCover content" name="commentCoverage tests buildBody tests dont show junit and diffCover content" time="0.003">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests show only junit content, without junit info" name="commentCoverage tests buildBody tests show only junit content, without junit info" time="0.001">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests show only junit content" name="commentCoverage tests buildBody tests show only junit content" time="0">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests show junit content, with failures info" name="commentCoverage tests buildBody tests show junit content, with failures info" time="0">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests show only diffCover content, without diff info" name="commentCoverage tests buildBody tests show only diffCover content, without diff info" time="0">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests show only diffCover content" name="commentCoverage tests buildBody tests show only diffCover content" time="0">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests diffCover content with full coverage" name="commentCoverage tests buildBody tests diffCover content with full coverage" time="0">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests diffCover content with no changes" name="commentCoverage tests buildBody tests diffCover content with no changes" time="0.001">
+    </testcase>
+    <testcase classname="commentCoverage tests buildBody tests diffCover content with missed range" name="commentCoverage tests buildBody tests diffCover content with missed range" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="main tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="5.041" tests="2">
+    <testcase classname="main tests empty content" name="main tests empty content" time="0.003">
+    </testcase>
+    <testcase classname="main tests exception" name="main tests exception" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Utils tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="5.068" tests="2">
+    <testcase classname="Utils tests exec command success" name="Utils tests exec command success" time="0.599">
+    </testcase>
+    <testcase classname="Utils tests exec command error" name="Utils tests exec command error" time="0.019">
+    </testcase>
+  </testsuite>
+  <testsuite name="lcov parser tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:53" time="0.703" tests="4">
+    <testcase classname="lcov parser tests No such file" name="lcov parser tests No such file" time="0.002">
+    </testcase>
+    <testcase classname="lcov parser tests Filename empty string" name="lcov parser tests Filename empty string" time="0.001">
+    </testcase>
+    <testcase classname="lcov parser tests Invalid xml content" name="lcov parser tests Invalid xml content" time="0.002">
+    </testcase>
+    <testcase classname="lcov parser tests Parse" name="lcov parser tests Parse" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="eventInput tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:53" time="0.814" tests="2">
+    <testcase classname="eventInput tests getEventInfo - pull_request" name="eventInput tests getEventInfo - pull_request" time="0.001">
+    </testcase>
+    <testcase classname="eventInput tests getEventInfo - push" name="eventInput tests getEventInfo - push" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="diffCover tests" errors="0" failures="0" skipped="0" timestamp="2023-04-13T10:26:48" time="5.722" tests="6">
+    <testcase classname="diffCover tests Empty responses showDiffcover false" name="diffCover tests Empty responses showDiffcover false" time="0.049">
+    </testcase>
+    <testcase classname="diffCover tests Empty responses empty added/modified/changed" name="diffCover tests Empty responses empty added/modified/changed" time="0.116">
+    </testcase>
+    <testcase classname="diffCover tests Responses with content diff info" name="diffCover tests Responses with content diff info" time="0.541">
+    </testcase>
+    <testcase classname="diffCover tests Responses with content with changed lines" name="diffCover tests Responses with content with changed lines" time="0.011">
+    </testcase>
+    <testcase classname="diffCover tests Exceptions invalid git log" name="diffCover tests Exceptions invalid git log" time="0.011">
+    </testcase>
+    <testcase classname="diffCover tests Exceptions invalid git blame" name="diffCover tests Exceptions invalid git blame" time="0.01">
+    </testcase>
+  </testsuite>
+</testsuites>

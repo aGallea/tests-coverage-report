@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="3" failures="0" errors="0" time="1.575">
+  <testsuite name="clover parser tests" errors="0" failures="0" skipped="0" timestamp="2023-03-22T13:46:04" time="1.374" tests="3">
+    <testcase classname="clover parser tests No such file" name="clover parser tests No such file" time="0.004">
+    </testcase>
+    <testcase classname="clover parser tests Filename empty string" name="clover parser tests Filename empty string" time="0.001">
+    </testcase>
+    <testcase classname="clover parser tests Parse" name="clover parser tests Parse" time="0.047">
+    </testcase>
+  </testsuite>
+</testsuites>

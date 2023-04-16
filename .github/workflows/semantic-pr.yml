@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Semantic PR
+concurrency:
+  group: Semantic-PR-${{ github.head_ref }}
+  cancel-in-progress: true
+on:
+  pull_request: null
+jobs:
+  semantic-pr:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+
+    - name: Pre-commit
+      uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: --from-ref ${{ github.event.pull_request.base.sha }} --to-ref ${{ github.event.pull_request.head.sha }}
+
+    - name: Semantic pull-request
+      uses: amannn/action-semantic-pull-request@v4.6.0
+      with:
+        requireScope: false
+        wip: true
+        validateSingleCommit: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

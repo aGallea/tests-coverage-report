@@ -1,0 +1,70 @@
+{
+  "name": "tests-coverage-report",
+  "version": "1.0.0",
+  "description": "tests coverage report as github action",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --silent",
+    "prebuild": "npm run lint",
+    "build": "tsc",
+    "prepackage": "npm run build",
+    "package": "./node_modules/.bin/ncc build dist/src/index.js --license licenses",
+    "postpackage": "npm run precommit:fix:mixed-line-ending ; npm run precommit:fix:end-of-file ; npm run precommit:fix:trailing-whitespace",
+    "precommit:fix:mixed-line-ending": "pre-commit run mixed-line-ending --files ./dist/index.js",
+    "precommit:fix:end-of-file": "pre-commit run end-of-file-fixer --files ./dist/index.js",
+    "precommit:fix:trailing-whitespace": "pre-commit run trailing-whitespace --files ./dist/index.js",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
+    "lint:format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aGallea/cover-report.git"
+  },
+  "keywords": [
+    "coverage",
+    "cubertura",
+    "junit",
+    "jacoco",
+    "lcov",
+    "clover",
+    "github"
+  ],
+  "author": "Asaf Gallea",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aGallea/cover-report/issues"
+  },
+  "homepage": "https://github.com/aGallea/cover-report#readme",
+  "devDependencies": {
+    "semantic-release": "^21.0.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.7",
+    "@semantic-release/npm": "^10.0.3",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "conventional-changelog-conventionalcommits": "^5.0.0",
+    "@types/jest": "^29.2.5",
+    "@types/xml2js": "^0.4.11",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
+    "@vercel/ncc": "^0.36.0",
+    "eslint": "^8.31.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard-with-typescript": "^26.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "jest-junit": "^15.0.0",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "xml2js": "^0.5.0"
+  }
+}
