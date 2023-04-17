@@ -100,5 +100,5 @@ Following inputs can be used as `step.with` keys
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [node-version]:https://img.shields.io/badge/nodejs-18.13.0-blue.svg
-[coverage-badge]:https://raw.githubusercontent.com/aGallea/tests-coverage-report/badges/coverage.svg
+[coverage-badge]:https://raw.githubusercontent.com/aGallea/tests-coverage-report/badges/.badges/master/coverage.svg
 [semrel-badge]:https://img.shields.io/badge/semantic--release-1?logo=semantic-release
