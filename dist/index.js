@@ -48,12 +48,36 @@ exports.getChangedFiles = getChangedFiles;
 /***/ }),
 
 /***/ 4533:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.buildBody = exports.commentCoverage = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const commentCoverage = async (eventInfo, body) => {
     const { eventName, payload } = github_1.context;
@@ -184,6 +208,10 @@ const buildDiffCoverHtml = (eventInfo, diffsInfo) => {
             }
             html += `<tr><td>Total</td><td>${totalCovered}/${totalLines}</td><td>${totalPercentage}%</td><td></td></tr>`;
             html += '</table></details>';
+            if (eventInfo.failUnderCoveragePercentage &&
+                totalPercentage < +eventInfo.minCoveragePercentage) {
+                core.setFailed('low coverage');
+            }
             return (`### Coverage Details ${totalPercentage > +eventInfo.minCoveragePercentage
                 ? `(${totalPercentage}% > ${eventInfo.minCoveragePercentage}%) :white_check_mark:`
                 : `(${totalPercentage}% < ${eventInfo.minCoveragePercentage}%) :x:`}\n\n` + html);
@@ -334,32 +362,6 @@ exports.getEventInfo = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const getEventInfo = () => {
-    if (process.env['ENV'] === 'local') {
-        const token = process.env['GITHUB_TOKEN'] || '';
-        const eventInfo = {
-            token: token,
-            commentTitle: 'Tests Report',
-            owner: 'aGallea',
-            repo: 'tests-coverage-report',
-            coberturaPath: './coverage/cobertura-coverage.xml',
-            cloverPath: '',
-            lcovPath: '',
-            jacocoPath: '',
-            junitPath: './coverage/junit.xml',
-            showJunit: true,
-            showDiffcover: true,
-            showFailuresInfo: true,
-            overrideComment: true,
-            commentId: '<!-- tests-coverage-report -->',
-            diffcoverRef: 'cobertura',
-            minCoveragePercentage: '80',
-            failUnderCoveragePercentage: true,
-            commitSha: '89e5f29',
-            headRef: 'semrel-packages',
-            baseRef: 'master',
-        };
-        return eventInfo;
-    }
     const eventInfo = {
         token: core.getInput('github-token', { required: true }),
         commentTitle: core.getInput('title', { required: false }),
@@ -1073,8 +1075,11 @@ const fs_1 = __importDefault(__nccwpck_require__(7147));
 const xml2js_1 = __importDefault(__nccwpck_require__(6189));
 const core = __importStar(__nccwpck_require__(2186));
 const unpackage = (testsuites) => {
-    const main = testsuites['$'];
+    const main = testsuites['$'] || testsuites.testsuite[0]['$'];
     const testsuite = testsuites.testsuite;
+    const errors = testsuite
+        ?.map((test) => +test['$'].errors)
+        .reduce((acc, curr) => acc + curr, 0) || 0;
     const skipped = testsuite
         ?.map((test) => +test['$'].skipped)
         .reduce((acc, curr) => acc + curr, 0) || 0;
@@ -1086,7 +1091,7 @@ const unpackage = (testsuites) => {
             classname: testCaseFailure['$'].classname.trim(),
             name: testCaseFailure['$'].name.trim(),
             time: `${parseFloat(testCaseFailure['$'].time).toFixed(2)}s`,
-            error: testCaseFailure.failure?.[0]?.split('\n')?.[0]?.trim() || 'unknown',
+            error: getTestFailureMessage(testCaseFailure),
         }));
     })
         .flat();
@@ -1096,10 +1101,22 @@ const unpackage = (testsuites) => {
             count: +main.failures,
             info: failureCase,
         },
-        errors: +main.errors,
+        errors: +main.errors || errors,
         skipped,
         time: `${parseFloat(main.time).toFixed(2)}s`,
     };
+};
+const getTestFailureMessage = (testCaseFailure) => {
+    const failure = testCaseFailure?.failure?.[0];
+    if (failure) {
+        if (typeof failure === 'string') {
+            return failure.split('\n')?.[0]?.trim() || 'unhandled string error';
+        }
+        else if (typeof failure === 'object') {
+            return failure['$']?.message || failure.message || 'unhandled object error';
+        }
+    }
+    return 'unknown failure';
 };
 const parseContent = (xml) => {
     return new Promise((resolve, reject) => {
