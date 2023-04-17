@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.459"
+        timestamp="2023-04-16T18:16:39.640115" hostname="Asafs-MBP.lan">
+        <testcase classname="tests.test_connector" name="test_deletion" time="0.063">
+            <failure
+                message="BadRequestError: BadRequestError(400, 'illegal_argument_exception', 'Wildcard expressions or all indices are not allowed')">@pytest.mark.asyncio
+                async def test_deletion():
+                current_timestamp = int(time.time())
+                path = '/*'
+                def mimetype_header_to_compat(header: str) -&gt; None:
+                # Converts all parts of a Accept/Content-Type headers
+                mimetype = request_headers.get(header, None)
+                if mimetype:
+                request_headers[header] = _COMPAT_MIMETYPE_RE.sub(
+                _COMPAT_MIMETYPE_SUB, mimetype
+                )
+
+                mimetype_header_to_compat("Accept")
+                mimetype_header_to_compat("Content-Type")
+
+                BadRequestError: BadRequestError(400, 'illegal_argument_exception',
+                'Wildcard expressions or all indices are not allowed')
+                venv/lib/python3.10/site-packages/a/_async/client/_base.py:321:
+                BadRequestError</failure>
+        </testcase>
+        <testcase classname="tests.test_connector" name="test_deletion" time="0.05">
+            <failure>BadRequestError(400, 'illegal_argument_exception')
+            </failure>
+        </testcase>
+        <testcase classname="tests.test_connector" name="test_deletion" time="0.05">
+            <failure/>
+        </testcase>
+    </testsuite>
+</testsuites>
