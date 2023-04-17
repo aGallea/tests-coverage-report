@@ -1,0 +1,41 @@
+name: Coverage Badge
+on:
+  push:
+    branches:
+    - master
+jobs:
+  release:
+    name: coverage-badge
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3.5.2
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint And Build
+      run: npm run build
+
+    - name: Run Tests
+      run: npm run test
+
+    - uses: action-badges/create-orphan-branch@0.1.0
+      with:
+        branch-name: badges
+
+    - name: Make Coverage Badge
+      uses: action-badges/cobertura-coverage-xml-badges@0.2.1
+      with:
+        file-name: coverage.svg
+        badge-branch: badges
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        coverage-file-name: ./coverage/cobertura-coverage.xml

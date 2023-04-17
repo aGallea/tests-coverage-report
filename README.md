@@ -1,6 +1,8 @@
 # tests-coverage-report
 
 ![node-version][node-version]
+![coverage][coverage-badge]
+![semrel][semrel-badge]
 
 ## About
 
@@ -10,6 +12,7 @@ Github Action for coverage report as a comment
 * [Usage](#usage)
 * [Customizing](#customizing)
   * [inputs](#inputs)
+* [Output Examples](#output-examples)
 
 ## Contributing
 
@@ -61,7 +64,7 @@ jobs:
 
     - name: Coverage Report
       if: always()
-      uses: aGallea/tests-coverage-report@master
+      uses: aGallea/tests-coverage-report@v1
       with:
         min-coverage-percentage: '90'
         fail-under-coverage-percentage: 'false'
@@ -90,5 +93,12 @@ Following inputs can be used as `step.with` keys
 | `show-failures-info` | Boolean | False    | false      | Show failures info on comment |
 | `override-comment`   | Boolean | False    | true      | Overrides existing coverage comment |
 
+## Output Examples
+
+![alt text](https://github.com/aGallea/tests-coverage-report/blob/master/media/no_details.png?raw=true)
+![alt text](https://github.com/aGallea/tests-coverage-report/blob/master/media/details.png?raw=true)
+
 <!-- MARKDOWN LINKS & IMAGES -->
 [node-version]:https://img.shields.io/badge/nodejs-18.13.0-blue.svg
+[coverage-badge]:https://raw.githubusercontent.com/aGallea/tests-coverage-report/badges/coverage.svg
+[semrel-badge]:https://img.shields.io/badge/semantic--release-1?logo=semantic-release
