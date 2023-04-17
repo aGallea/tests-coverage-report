@@ -5,6 +5,18 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/aGallea/tests-coverage-report/compare/1.0.1...1.1.0) (2023-04-17)
+
+
+### Features
+
+* release ([e0dd977](https://github.com/aGallea/tests-coverage-report/commit/e0dd9778a0fbbaff6652e7f6201b40de4e3a2dd1))
+
+
+### Bug Fixes
+
+* **junit:** parse fix for different schema ([7662924](https://github.com/aGallea/tests-coverage-report/commit/766292409834f44efe3eb20cfec7bd4eff8aa705))
+
 ## [1.0.1](https://github.com/aGallea/tests-coverage-report/compare/1.0.0...1.0.1) (2023-04-16)
 
 

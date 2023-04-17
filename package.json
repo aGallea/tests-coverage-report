@@ -1,6 +1,6 @@
 {
   "name": "tests-coverage-report",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "tests coverage report as github action",
   "main": "index.js",
   "scripts": {
