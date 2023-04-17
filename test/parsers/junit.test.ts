@@ -31,6 +31,28 @@ describe('junit parser tests', () => {
     expect(parsed?.failures.count).toEqual(0);
     expect(parsed?.failures.info).toHaveLength(0);
   });
+  test('Parse V2', async () => {
+    const parsed = await parseFile('./test/assets/junitV2.xml');
+    expect(parsed).toBeDefined();
+    expect(parsed?.tests).toEqual(1);
+    expect(parsed?.time).toEqual('3.46s');
+    expect(parsed?.skipped).toEqual(0);
+    expect(parsed?.errors).toEqual(0);
+    expect(parsed?.failures).toBeDefined();
+    expect(parsed?.failures.count).toEqual(1);
+    expect(parsed?.failures.info).toHaveLength(3);
+    expect(parsed?.failures.info?.[0]?.classname).toEqual('tests.test_connector');
+    expect(parsed?.failures.info?.[0]?.error).toEqual(
+      `BadRequestError: BadRequestError(400, 'illegal_argument_exception', 'Wildcard expressions or all indices are not allowed')`,
+    );
+    expect(parsed?.failures.info?.[0]?.name).toEqual('test_deletion');
+    expect(parsed?.failures.info?.[0]?.time).toEqual('0.06s');
+    expect(parsed?.failures.info?.[1]?.error).toEqual(
+      `BadRequestError(400, 'illegal_argument_exception')`,
+    );
+    expect(parsed?.failures.info?.[1]?.time).toEqual('0.05s');
+    expect(parsed?.failures.info?.[2]?.error).toEqual('unknown failure');
+  });
   test('Parse with failures', async () => {
     const parsed = await parseFile('./test/assets/junitWithFailures.xml');
     expect(parsed).toBeDefined();

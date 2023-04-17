@@ -5,8 +5,13 @@ import parseString from 'xml2js';
 import * as core from '@actions/core';
 
 const unpackage = (testsuites: any): Junit => {
-  const main = testsuites['$'];
+  const main = testsuites['$'] || testsuites.testsuite[0]['$'];
   const testsuite: any[] = testsuites.testsuite;
+
+  const errors =
+    testsuite
+      ?.map((test: any) => +test['$'].errors)
+      .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const skipped =
     testsuite
@@ -23,7 +28,7 @@ const unpackage = (testsuites: any): Junit => {
         classname: testCaseFailure['$'].classname.trim(),
         name: testCaseFailure['$'].name.trim(),
         time: `${parseFloat(testCaseFailure['$'].time).toFixed(2)}s`,
-        error: testCaseFailure.failure?.[0]?.split('\n')?.[0]?.trim() || 'unknown',
+        error: getTestFailureMessage(testCaseFailure),
       }));
     })
     .flat();
@@ -34,10 +39,22 @@ const unpackage = (testsuites: any): Junit => {
       count: +main.failures,
       info: failureCase,
     },
-    errors: +main.errors,
+    errors: +main.errors || errors,
     skipped,
     time: `${parseFloat(main.time).toFixed(2)}s`,
   };
+};
+
+const getTestFailureMessage = (testCaseFailure: any): string => {
+  const failure = testCaseFailure?.failure?.[0];
+  if (failure) {
+    if (typeof failure === 'string') {
+      return failure.split('\n')?.[0]?.trim() || 'unhandled string error';
+    } else if (typeof failure === 'object') {
+      return failure['$']?.message || failure.message || 'unhandled object error';
+    }
+  }
+  return 'unknown failure';
 };
 
 const parseContent = (xml: string): Promise<Junit> => {
