@@ -297,14 +297,10 @@ exports.diffCover = diffCover;
 const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
     const diffInfo = [];
     for (const fileCoverInfo of coverageInfo[referral]) {
-        core.info(`fileCoverInfo: [${fileCoverInfo}]`);
-        core.info(`changedFiles: [${changedFiles}]`);
         for (const currFile of changedFiles) {
-            core.info(`currFile: [${currFile}]`);
             const changedLinesExec = await (0, utils_1.execCommand)(`git blame ${currFile} | grep -n '${commitsSha.join('\\|')}' | cut -f1 -d:`);
             if (changedLinesExec.status === 'success') {
                 const changedLines = changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
-                core.info(`changedLines: [${changedLines}]`);
                 if (changedLines.length) {
                     if (fileCoverInfo.lines.details.length) {
                         if (fileCoverInfo.file === currFile) {
@@ -391,7 +387,6 @@ const getEventInfo = () => {
         baseRef: '',
         pwd: process.env.GITHUB_WORKSPACE || '',
     };
-    core.info(`GITHUB_WORKSPACE=${process.env.GITHUB_WORKSPACE}`);
     if (github_1.context.eventName === 'pull_request' && github_1.context.payload) {
         eventInfo.commitSha = github_1.context.payload.pull_request?.head.sha;
         eventInfo.headRef = github_1.context.payload.pull_request?.head.ref;

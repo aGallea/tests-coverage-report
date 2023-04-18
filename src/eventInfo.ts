@@ -28,7 +28,6 @@ export const getEventInfo = (): EventInfo => {
     baseRef: '',
     pwd: process.env.GITHUB_WORKSPACE || '',
   };
-  core.info(`GITHUB_WORKSPACE=${process.env.GITHUB_WORKSPACE}`);
   if (context.eventName === 'pull_request' && context.payload) {
     eventInfo.commitSha = context.payload.pull_request?.head.sha;
     eventInfo.headRef = context.payload.pull_request?.head.ref;
