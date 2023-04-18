@@ -296,11 +296,17 @@ const diffCover = async (eventInfo, filesStatus, coverageInfo) => {
 exports.diffCover = diffCover;
 const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
     const diffInfo = [];
+    core.info('getDiff');
     for (const fileCoverInfo of coverageInfo[referral]) {
+        core.info(`fileCoverInfo: [${fileCoverInfo}]`);
+        core.info(`changedFiles: [${changedFiles}]`);
         for (const currFile of changedFiles) {
+            core.info(`currFile: [${currFile}]`);
             const changedLinesExec = await (0, utils_1.execCommand)(`git blame ${currFile} | grep -n '${commitsSha.join('\\|')}' | cut -f1 -d:`);
             if (changedLinesExec.status === 'success') {
                 const changedLines = changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
+                core.info(`changedLinesExec.stdout: [${changedLinesExec.stdout}]`);
+                core.info(`changedLines: [${changedLines}]`);
                 if (changedLines.length) {
                     if (fileCoverInfo.lines.details.length) {
                         if (fileCoverInfo.file === currFile) {
