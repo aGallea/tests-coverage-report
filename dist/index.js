@@ -296,7 +296,6 @@ const diffCover = async (eventInfo, filesStatus, coverageInfo) => {
 exports.diffCover = diffCover;
 const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
     const diffInfo = [];
-    core.info('getDiff');
     for (const fileCoverInfo of coverageInfo[referral]) {
         core.info(`fileCoverInfo: [${fileCoverInfo}]`);
         core.info(`changedFiles: [${changedFiles}]`);
@@ -305,7 +304,6 @@ const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
             const changedLinesExec = await (0, utils_1.execCommand)(`git blame ${currFile} | grep -n '${commitsSha.join('\\|')}' | cut -f1 -d:`);
             if (changedLinesExec.status === 'success') {
                 const changedLines = changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
-                core.info(`changedLinesExec.stdout: [${changedLinesExec.stdout}]`);
                 core.info(`changedLines: [${changedLines}]`);
                 if (changedLines.length) {
                     if (fileCoverInfo.lines.details.length) {
@@ -391,7 +389,9 @@ const getEventInfo = () => {
         commitSha: '',
         headRef: '',
         baseRef: '',
+        pwd: process.env.GITHUB_WORKSPACE || '',
     };
+    core.info(`GITHUB_WORKSPACE=${process.env.GITHUB_WORKSPACE}`);
     if (github_1.context.eventName === 'pull_request' && github_1.context.payload) {
         eventInfo.commitSha = github_1.context.payload.pull_request?.head.sha;
         eventInfo.headRef = github_1.context.payload.pull_request?.head.ref;
@@ -495,7 +495,7 @@ const main = async () => {
         const eventInfo = (0, eventInfo_1.getEventInfo)();
         const coverageInfo = {
             cobertura: eventInfo.diffcoverRef === 'cobertura'
-                ? await (0, cobertura_1.parseFile)(eventInfo.coberturaPath)
+                ? await (0, cobertura_1.parseFile)(eventInfo.coberturaPath, `${eventInfo.pwd}/`)
                 : [],
             clover: eventInfo.diffcoverRef === 'clover'
                 ? await (0, clover_1.parseFile)(eventInfo.cloverPath)
@@ -734,6 +734,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseFile = void 0;
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const path_1 = __importDefault(__nccwpck_require__(1017));
 const xml2js_1 = __importDefault(__nccwpck_require__(6189));
 const core = __importStar(__nccwpck_require__(2186));
 const classesFromPackages = (packages) => {
@@ -779,15 +780,16 @@ const extractLcovStyleBranches = (c) => {
     }
     return branches;
 };
-const unpackage = (coverage) => {
+const unpackage = (coverage, pwd) => {
     const packages = coverage.packages;
-    // const source = coverage.sources[0].source[0];
+    const source = coverage.sources[0].source[0];
     const classes = classesFromPackages(packages);
     return classes.map((c) => {
         const branches = extractLcovStyleBranches(c);
         const classCov = {
             title: c.$.name,
-            file: c.$.filename,
+            // file: c.$.filename,
+            file: path_1.default.join(source, c.$.filename).replace(pwd, ''),
             functions: {
                 found: c.methods && c.methods[0].method ? c.methods[0].method.length : 0,
                 hit: 0,
@@ -830,7 +832,7 @@ const unpackage = (coverage) => {
         return classCov;
     });
 };
-const parseContent = (xml) => {
+const parseContent = (xml, pwd) => {
     return new Promise((resolve, reject) => {
         xml2js_1.default.parseString(xml, (err, parseResult) => {
             if (err) {
@@ -839,12 +841,12 @@ const parseContent = (xml) => {
             if (!parseResult?.coverage) {
                 return reject(new Error('invalid or missing xml content'));
             }
-            const result = unpackage(parseResult.coverage);
+            const result = unpackage(parseResult.coverage, pwd);
             resolve(result);
         });
     });
 };
-const parseFile = async (file) => {
+const parseFile = async (file, pwd) => {
     return new Promise((resolve, reject) => {
         if (!file || file === '') {
             core.info('no file specified');
@@ -858,7 +860,7 @@ const parseFile = async (file) => {
                 }
                 else {
                     try {
-                        const info = await parseContent(data);
+                        const info = await parseContent(data, pwd);
                         // console.log('====== cobertura ======');
                         // console.log(JSON.stringify(info, null, 2));
                         resolve(info);
