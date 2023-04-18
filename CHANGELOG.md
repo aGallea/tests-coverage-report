@@ -5,6 +5,13 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1](https://github.com/aGallea/tests-coverage-report/compare/1.2.0...1.2.1) (2023-04-18)
+
+
+### Bug Fixes
+
+* **cobertura:** forge file name from pwd, source and filename ([ddc9978](https://github.com/aGallea/tests-coverage-report/commit/ddc9978d6bef8b3223f5f0f4e8be54b5eb792a7e))
+
 ## [1.2.0](https://github.com/aGallea/tests-coverage-report/compare/1.1.0...1.2.0) (2023-04-17)
 
 
