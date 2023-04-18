@@ -157,8 +157,8 @@ const buildDiffCoverHtml = (eventInfo: EventInfo, diffsInfo: DiffInfo[]) => {
       }
       return (
         `### Coverage Details ${
-          totalPercentage > +eventInfo.minCoveragePercentage
-            ? `(${totalPercentage}% > ${eventInfo.minCoveragePercentage}%) :white_check_mark:`
+          totalPercentage >= +eventInfo.minCoveragePercentage
+            ? `(${totalPercentage}% >= ${eventInfo.minCoveragePercentage}%) :white_check_mark:`
             : `(${totalPercentage}% < ${eventInfo.minCoveragePercentage}%) :x:`
         }\n\n` + html
       );
