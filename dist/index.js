@@ -213,7 +213,7 @@ const buildDiffCoverHtml = (eventInfo, diffsInfo) => {
                 core.setFailed('low coverage');
             }
             return (`### Coverage Details ${totalPercentage >= +eventInfo.minCoveragePercentage
-                ? `(${totalPercentage}% > ${eventInfo.minCoveragePercentage}%) :white_check_mark:`
+                ? `(${totalPercentage}% >= ${eventInfo.minCoveragePercentage}%) :white_check_mark:`
                 : `(${totalPercentage}% < ${eventInfo.minCoveragePercentage}%) :x:`}\n\n` + html);
         }
     }
