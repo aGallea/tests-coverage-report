@@ -2,26 +2,29 @@ import { parseFile } from '../../src/parsers/cobertura';
 
 describe('cobertura parser tests', () => {
   test('No such file', async () => {
-    await expect(parseFile('invalid.file')).rejects.toThrow(
+    await expect(parseFile('invalid.file', '')).rejects.toThrow(
       `ENOENT: no such file or directory, open 'invalid.file'`,
     );
   });
   test('Filename empty string', async () => {
-    await expect(parseFile('')).resolves.toEqual([]);
+    await expect(parseFile('', '')).resolves.toEqual([]);
   });
   test('Invalid xml content', async () => {
-    await expect(parseFile('./test/assets/invalid.xml')).rejects.toThrow(
+    await expect(parseFile('./test/assets/invalid.xml', '')).rejects.toThrow(
       'invalid or missing xml content',
     );
   });
   test('error xml content', async () => {
-    await expect(parseFile('./test/assets/invalidXmlContent.xml')).rejects.toThrow(
+    await expect(parseFile('./test/assets/invalidXmlContent.xml', '')).rejects.toThrow(
       'Non-whitespace before first tag.\nLine: 0\nColumn: 1\nChar: s',
     );
   });
 
   test('Parse', async () => {
-    const parsed = await parseFile('./test/assets/cobertura-coverage.xml');
+    const parsed = await parseFile(
+      './test/assets/cobertura-coverage.xml',
+      '/Users/user/workspace/private/tests-coverage-report/',
+    );
     expect(parsed).toHaveLength(12);
     expect(parsed[0].file).toEqual('src/changedFiles.ts');
     expect(parsed[0].functions.found).toEqual(1);

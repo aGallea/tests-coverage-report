@@ -16,7 +16,7 @@ export const main = async (): Promise<void> => {
     const coverageInfo: CoverageTypeInfo = {
       cobertura:
         eventInfo.diffcoverRef === 'cobertura'
-          ? await parseCoberturaFile(eventInfo.coberturaPath)
+          ? await parseCoberturaFile(eventInfo.coberturaPath, `${eventInfo.pwd}/`)
           : [],
       clover:
         eventInfo.diffcoverRef === 'clover'

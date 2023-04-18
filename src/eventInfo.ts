@@ -26,6 +26,7 @@ export const getEventInfo = (): EventInfo => {
     commitSha: '',
     headRef: '',
     baseRef: '',
+    pwd: process.env.GITHUB_WORKSPACE || '',
   };
   if (context.eventName === 'pull_request' && context.payload) {
     eventInfo.commitSha = context.payload.pull_request?.head.sha;

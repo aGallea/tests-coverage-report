@@ -36,7 +36,10 @@ describe('diffCover tests', () => {
   describe('Empty responses', () => {
     test('showDiffcover false', async () => {
       const eventInfo: EventInfo = getEventInfo();
-      const cobertura = await parseFile('./test/assets/cobertura-coverage.xml');
+      const cobertura = await parseFile(
+        './test/assets/cobertura-coverage.xml',
+        '/Users/user/workspace/private/tests-coverage-report/',
+      );
       const coverageInfo: CoverageTypeInfo = {
         cobertura,
         clover: [],
@@ -55,7 +58,10 @@ describe('diffCover tests', () => {
       const eventInfo: EventInfo = getEventInfo();
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
-      const cobertura = await parseFile('./test/assets/cobertura-coverage.xml');
+      const cobertura = await parseFile(
+        './test/assets/cobertura-coverage.xml',
+        '/Users/user/workspace/private/tests-coverage-report/',
+      );
       const coverageInfo: CoverageTypeInfo = {
         cobertura,
         clover: [],
@@ -77,7 +83,10 @@ describe('diffCover tests', () => {
       const eventInfo: EventInfo = getEventInfo();
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
-      const cobertura = await parseFile('./test/assets/cobertura-coverage.xml');
+      const cobertura = await parseFile(
+        './test/assets/cobertura-coverage.xml',
+        '/Users/user/workspace/private/tests-coverage-report/',
+      );
       const coverageInfo: CoverageTypeInfo = {
         cobertura,
         clover: [],
@@ -117,7 +126,10 @@ describe('diffCover tests', () => {
       const eventInfo: EventInfo = getEventInfo();
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
-      const cobertura = await parseFile('./test/assets/cobertura-coverage.xml');
+      const cobertura = await parseFile(
+        './test/assets/cobertura-coverage.xml',
+        '/Users/user/workspace/private/tests-coverage-report/',
+      );
       const coverageInfo: CoverageTypeInfo = {
         cobertura,
         clover: [],
@@ -238,7 +250,10 @@ describe('diffCover tests', () => {
         });
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
-      const cobertura = await parseFile('./test/assets/cobertura-coverage.xml');
+      const cobertura = await parseFile(
+        './test/assets/cobertura-coverage.xml',
+        '/Users/user/workspace/private/tests-coverage-report/',
+      );
       const coverageInfo: CoverageTypeInfo = {
         cobertura,
         clover: [],
