@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs';
+import path from 'path';
 import { CoverInfo, CoverInfoBranchesDetails } from '../types';
 import parseString from 'xml2js';
 import * as core from '@actions/core';
@@ -55,16 +56,17 @@ const extractLcovStyleBranches = (c: any) => {
   return branches;
 };
 
-const unpackage = (coverage: any): CoverInfo[] => {
+const unpackage = (coverage: any, pwd: string): CoverInfo[] => {
   const packages = coverage.packages;
-  // const source = coverage.sources[0].source[0];
+  const source = coverage.sources[0].source[0];
 
   const classes = classesFromPackages(packages);
   return classes.map((c) => {
     const branches = extractLcovStyleBranches(c);
     const classCov: CoverInfo = {
       title: c.$.name,
-      file: c.$.filename,
+      // file: c.$.filename,
+      file: path.join(source, c.$.filename).replace(pwd, ''),
       functions: {
         found: c.methods && c.methods[0].method ? c.methods[0].method.length : 0,
         hit: 0,
@@ -113,7 +115,7 @@ const unpackage = (coverage: any): CoverInfo[] => {
   });
 };
 
-const parseContent = (xml: string): Promise<CoverInfo[]> => {
+const parseContent = (xml: string, pwd: string): Promise<CoverInfo[]> => {
   return new Promise((resolve, reject) => {
     parseString.parseString(xml, (err, parseResult) => {
       if (err) {
@@ -122,13 +124,13 @@ const parseContent = (xml: string): Promise<CoverInfo[]> => {
       if (!parseResult?.coverage) {
         return reject(new Error('invalid or missing xml content'));
       }
-      const result = unpackage(parseResult.coverage);
+      const result = unpackage(parseResult.coverage, pwd);
       resolve(result);
     });
   });
 };
 
-export const parseFile = async (file: string): Promise<CoverInfo[]> => {
+export const parseFile = async (file: string, pwd: string): Promise<CoverInfo[]> => {
   return new Promise((resolve, reject) => {
     if (!file || file === '') {
       core.info('no file specified');
@@ -143,7 +145,7 @@ export const parseFile = async (file: string): Promise<CoverInfo[]> => {
             reject(err);
           } else {
             try {
-              const info = await parseContent(data);
+              const info = await parseContent(data, pwd);
               // console.log('====== cobertura ======');
               // console.log(JSON.stringify(info, null, 2));
               resolve(info);
