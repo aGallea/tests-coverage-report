@@ -5,6 +5,14 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2](https://github.com/aGallea/tests-coverage-report/compare/1.2.1...1.2.2) (2023-04-18)
+
+
+### Bug Fixes
+
+* **coverage:** percentage lower-equal ([f4b635d](https://github.com/aGallea/tests-coverage-report/commit/f4b635d8ad111ec29011a10054ce3536c5e875eb))
+* **coverage:** percentage lower-equal ([9a0e193](https://github.com/aGallea/tests-coverage-report/commit/9a0e19356abff29c2c855d2c3d306b9c36cc579a))
+
 ## [1.2.1](https://github.com/aGallea/tests-coverage-report/compare/1.2.0...1.2.1) (2023-04-18)
 
 
