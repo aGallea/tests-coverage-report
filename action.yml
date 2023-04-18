@@ -1,5 +1,5 @@
-name: Tests Cover Report
-description: todo
+name: Tests Coverage Report
+description: Comments tests coverage report
 branding:
   icon: archive
   color: purple
