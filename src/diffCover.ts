@@ -41,7 +41,6 @@ const getDiff = async (
   referral: DiffCoverRef,
 ): Promise<DiffInfo[]> => {
   const diffInfo: DiffInfo[] = [];
-  core.info('getDiff');
   for (const fileCoverInfo of coverageInfo[referral]) {
     core.info(`fileCoverInfo: [${fileCoverInfo}]`);
     core.info(`changedFiles: [${changedFiles}]`);
@@ -53,7 +52,6 @@ const getDiff = async (
       if (changedLinesExec.status === 'success') {
         const changedLines =
           changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
-        core.info(`changedLinesExec.stdout: [${changedLinesExec.stdout}]`);
         core.info(`changedLines: [${changedLines}]`);
         if (changedLines.length) {
           if (fileCoverInfo.lines.details.length) {
