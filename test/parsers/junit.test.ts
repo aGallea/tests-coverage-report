@@ -53,6 +53,29 @@ describe('junit parser tests', () => {
     expect(parsed?.failures.info?.[1]?.time).toEqual('0.05s');
     expect(parsed?.failures.info?.[2]?.error).toEqual('unknown failure');
   });
+  test('Parse V3', async () => {
+    const parsed = await parseFile('./test/assets/junitV3.xml');
+    expect(parsed).toBeDefined();
+    expect(parsed?.tests).toEqual(3);
+    expect(parsed?.time).toEqual('3.88s');
+    expect(parsed?.skipped).toEqual(1);
+    expect(parsed?.errors).toEqual(0);
+    expect(parsed?.failures).toBeDefined();
+    expect(parsed?.failures.count).toEqual(2);
+    expect(parsed?.failures.info).toHaveLength(2);
+    expect(parsed?.failures.info?.[0].time).toEqual('3.84s');
+    expect(parsed?.failures.info?.[0].name).toEqual('testListRequestWithConditions');
+    expect(parsed?.failures.info?.[0].error).toEqual(
+      'expected:<...2Response(isSuccess=[true, code=200, message=null, totalHits=51, globalTotalHits=5151',
+    );
+    expect(parsed?.failures.info?.[0].classname).toEqual('com.foo.bar.ServletTest');
+    expect(parsed?.failures.info?.[1].time).toEqual('0.01s');
+    expect(parsed?.failures.info?.[1].name).toEqual('testListRequestWithConditions');
+    expect(parsed?.failures.info?.[1].error).toEqual(
+      'expected:<...2Response(isSuccess=[true, code=200, message=null, totalHits=264, globalTotalHits=8090',
+    );
+    expect(parsed?.failures.info?.[1].classname).toEqual('com.foo.bar.ServletTest');
+  });
   test('Parse with failures', async () => {
     const parsed = await parseFile('./test/assets/junitWithFailures.xml');
     expect(parsed).toBeDefined();

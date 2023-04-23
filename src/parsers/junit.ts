@@ -6,7 +6,9 @@ import * as core from '@actions/core';
 
 const unpackage = (testsuites: any): Junit => {
   const main = testsuites['$'] || testsuites.testsuite[0]['$'];
-  const testsuite: any[] = testsuites.testsuite;
+  const testsuite: any[] = Array.isArray(testsuites.testsuite)
+    ? testsuites.testsuite
+    : [testsuites];
 
   const errors =
     testsuite
@@ -51,7 +53,11 @@ const getTestFailureMessage = (testCaseFailure: any): string => {
     if (typeof failure === 'string') {
       return failure.split('\n')?.[0]?.trim() || 'unhandled string error';
     } else if (typeof failure === 'object') {
-      return failure['$']?.message || failure.message || 'unhandled object error';
+      return (
+        failure['$']?.message?.substring(0, 128) ||
+        failure.message?.substring(0, 128) ||
+        'unhandled object error'
+      );
     }
   }
   return 'unknown failure';
@@ -63,10 +69,10 @@ const parseContent = (xml: string): Promise<Junit> => {
       if (err) {
         return reject(err);
       }
-      if (!parseResult?.testsuites) {
+      if (!parseResult?.testsuites && !parseResult?.testsuite) {
         return reject(new Error('invalid or missing xml content'));
       }
-      const result = unpackage(parseResult.testsuites);
+      const result = unpackage(parseResult.testsuites || parseResult.testsuite);
       resolve(result);
     });
   });

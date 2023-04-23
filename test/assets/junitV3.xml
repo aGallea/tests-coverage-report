@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.server.class.ServletTest" time="3.879" tests="3" errors="0" skipped="1" failures="2">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/Users/user/workspace/server/target/test-classes:/Users/user/workspace/server/target/classes"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="IL"/>
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/lib"/>
+    <property name="sun.java.command" value="/Users/user/workspace/server/target/surefire/surefirebooter2154443995827516689.jar /Users/user/workspace/server/target/surefire 2023-04-23T14-44-56_611-jvmRun1 surefire681112939758500339tmp surefire_013658534742964283789tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/Users/user/workspace/server/target/test-classes:/Users/user/workspace/server/target/classes:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/Users/user"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2022-04-19"/>
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/Users/user/workspace/server"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="surefire.real.class.path" value="/Users/user/workspace/server/target/surefire/surefirebooter2154443995827516689.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.3+7"/>
+    <property name="user.name" value="user"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="12.6"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-17.0.3+7"/>
+    <property name="localRepository" value="/Users/user/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="/var/folders/x0/z8cnrq89243fv317kptvwygh0000gp/T/"/>
+    <property name="java.version" value="17.0.3"/>
+    <property name="user.dir" value="/Users/user/workspace/server"/>
+    <property name="os.arch" value="aarch64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/Users/user/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="17.0.3+7"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="java.class.version" value="61.0"/>
+  </properties>
+  <testcase name="testListRequestWithConditions" classname="com.foo.bar.ServletTest" time="3.843">
+    <failure message="expected:&lt;...2Response(isSuccess=[true, code=200, message=null, totalHits=51, globalTotalHits=5151" type="org.junit.ComparisonFailure"> <![CDATA[org.junit.ComparisonFailure: expected:<...2Response(isSuccess=[true, code=200, message=null, totalHits=51, globalTotalHits=5151>
+	at com.foo.bar.ServletTest.testListRequestWithConditions(ServletTest.java:113)
+	]]></failure>
+	<system-out><![CDATA[23-04-2023 14:44:58,722 INFO [Version]: [main] [ ] HCANN000001: Hibernate Commons Annotations {4.0.1.Final}
+23-04-2023 14:44:58,731 INFO [Version]: [main] [ ] HHH000412: Hibernate Core {4.1.3.Final}
+23-04-2023 14:44:58,733 INFO [Environment]: [main] [ ] HHH000206: hibernate.properties not found
+23-04-2023 14:44:58,735 INFO [Environment]: [main] [ ] HHH000021: Bytecode provider name : javassist
+javax.persistence.PersistenceException: org.hibernate.exception.JDBCConnectionException: Could not open connection
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1367) ~[hibernate-entitymanager-4.1.3.Final.jar:4.1.3.Final]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126) ~[surefire-booter-2.22.2.jar:2.22.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418) ~[surefire-booter-2.22.2.jar:2.22.2]
+Caused by: org.hibernate.exception.JDBCConnectionException: Could not open connection
+	at org.hibernate.exception.internal.SQLStateConversionDelegate.convert(SQLStateConversionDelegate.java:131) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:49) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+	at org.hibernate.internal.QueryImpl.list(QueryImpl.java:101) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.ejb.QueryImpl.getResultList(QueryImpl.java:256) ~[hibernate-entitymanager-4.1.3.Final.jar:4.1.3.Final]
+	... 30 more
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+	... 30 more
+]]></system-out>
+    <system-err><![CDATA[Loading class `com.mysql.jdbc.Driver'. This is deprecated. The new driver class is `com.mysql.cj.jdbc.Driver'. The driver is automatically registered via the SPI and manual loading of the driver class is generally unnecessary.
+]]></system-err>
+  </testcase>
+  <testcase name="testListRequestWithConditions" classname="com.foo.bar.ServletTest" time="0.01">
+    <failure message="expected:&lt;...2Response(isSuccess=[true, code=200, message=null, totalHits=264, globalTotalHits=8090" type="org.junit.ComparisonFailure"></failure>
+    <system-out><![CDATA[23-04-2023 14:45:01,019 WARN [SqlExceptionHelper]: [main] [ ] SQL Error: 0, SQLState: 08S01
+23-04-2023 14:45:01,019 ERROR [SqlExceptionHelper]: [main] [ ] Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+14:45:01.019 [main] ERROR com.foo.bar.handlers.RequestHandler - An error occurred while processing request
+javax.persistence.PersistenceException: org.hibernate.exception.JDBCConnectionException: Could not open connection
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1367) ~[hibernate-entitymanager-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.internal.QueryImpl.list(QueryImpl.java:101) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.ejb.QueryImpl.getResultList(QueryImpl.java:256) ~[hibernate-entitymanager-4.1.3.Final.jar:4.1.3.Final]
+	... 30 more
+Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:174) ~[mysql-connector-java-8.0.30.jar:8.0.30]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:64) ~[mysql-connector-java-8.0.30.jar:8.0.30]
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:828) ~[mysql-connector-java-8.0.30.jar:8.0.30]
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:448) ~[mysql-connector-java-8.0.30.jar:8.0.30]
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:241) ~[mysql-connector-java-8.0.30.jar:8.0.30]
+	at org.hibernate.ejb.QueryImpl.getResultList(QueryImpl.java:256) ~[hibernate-entitymanager-4.1.3.Final.jar:4.1.3.Final]
+	... 30 more
+]]></system-out>
+  </testcase>
+  <testcase name="testListRequestWithoutConditions" classname="com.foo.bar.ServletTest" time="0">
+    <skipped/>
+  </testcase>
+</testsuite>
