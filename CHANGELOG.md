@@ -5,6 +5,13 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/aGallea/tests-coverage-report/compare/1.2.2...1.3.0) (2023-04-25)
+
+
+### Features
+
+* **junit:** parse folder with multiple files ([60dc9cb](https://github.com/aGallea/tests-coverage-report/commit/60dc9cbb16afd1c0f0a1bfb2fba82fcb8dad3ba5))
+
 ## [1.2.2](https://github.com/aGallea/tests-coverage-report/compare/1.2.1...1.2.2) (2023-04-18)
 
 
