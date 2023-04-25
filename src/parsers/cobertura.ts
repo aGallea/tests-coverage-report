@@ -133,7 +133,7 @@ const parseContent = (xml: string, pwd: string): Promise<CoverInfo[]> => {
 export const parseFile = async (file: string, pwd: string): Promise<CoverInfo[]> => {
   return new Promise((resolve, reject) => {
     if (!file || file === '') {
-      core.info('no file specified');
+      core.info('no cobertura file specified');
       resolve([]);
     } else {
       fs.readFile(

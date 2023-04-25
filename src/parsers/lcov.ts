@@ -109,7 +109,7 @@ const parseContent = (str: string): CoverInfo[] => {
 export function parseFile(file: string): Promise<CoverInfo[]> {
   return new Promise((resolve, reject) => {
     if (!file || file === '') {
-      core.info('no file specified');
+      core.info('no lcov file specified');
       resolve([]);
     } else {
       fs.readFile(

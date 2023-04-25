@@ -499,7 +499,7 @@ const main = async () => {
             jacoco: eventInfo.diffcoverRef === 'jacoco'
                 ? await (0, jacoco_1.parseFile)(eventInfo.jacocoPath)
                 : [],
-            junit: eventInfo.showJunit ? await (0, junit_1.parseFile)(eventInfo.junitPath) : undefined,
+            junit: eventInfo.showJunit ? await (0, junit_1.parse)(eventInfo.junitPath) : undefined,
         };
         const changedFile = await (0, changedFiles_1.getChangedFiles)(eventInfo);
         const diffInfo = await (0, diffCover_1.diffCover)(eventInfo, changedFile, coverageInfo);
@@ -664,7 +664,7 @@ const parseContent = (xml) => {
 const parseFile = async (file) => {
     return new Promise((resolve, reject) => {
         if (!file || file === '') {
-            core.info('no file specified');
+            core.info('no clover file specified');
             resolve([]);
         }
         else {
@@ -844,7 +844,7 @@ const parseContent = (xml, pwd) => {
 const parseFile = async (file, pwd) => {
     return new Promise((resolve, reject) => {
         if (!file || file === '') {
-            core.info('no file specified');
+            core.info('no cobertura file specified');
             resolve([]);
         }
         else {
@@ -1010,7 +1010,7 @@ const parseContent = (xml) => {
 const parseFile = async (file) => {
     return new Promise((resolve, reject) => {
         if (!file || file === '') {
-            core.info('no file specified');
+            core.info('no jacoco file specified');
             resolve([]);
         }
         else {
@@ -1072,7 +1072,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseFile = void 0;
+exports.parse = void 0;
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const xml2js_1 = __importDefault(__nccwpck_require__(6189));
@@ -1135,35 +1135,114 @@ const parseContent = (xml) => {
         });
     });
 };
+const parse = async (path) => {
+    if (!path || path === '') {
+        core.info('no junit file/folder specified');
+        return undefined;
+    }
+    if (fs_1.default.lstatSync(path).isFile()) {
+        return parseFile(path);
+    }
+    else if (fs_1.default.lstatSync(path).isDirectory()) {
+        return parseFolder(path);
+    }
+};
+exports.parse = parse;
 const parseFile = async (file) => {
     return new Promise((resolve, reject) => {
-        if (!file || file === '') {
-            core.info('no file specified');
-            resolve(undefined);
-        }
-        else {
-            fs_1.default.readFile(file, 'utf8', async (err, data) => {
-                if (err) {
-                    core.error(`failed to read file: ${file}. error: ${err.message}`);
-                    reject(err);
+        fs_1.default.readFile(file, 'utf8', async (err, data) => {
+            if (err) {
+                core.error(`failed to read file: ${file}. error: ${err.message}`);
+                reject(err);
+            }
+            else {
+                try {
+                    const info = await parseContent(data);
+                    // console.log('====== junit ======');
+                    // console.log(JSON.stringify(info, null, 2));
+                    resolve(info);
                 }
-                else {
-                    try {
-                        const info = await parseContent(data);
-                        // console.log('====== junit ======');
-                        // console.log(JSON.stringify(info, null, 2));
-                        resolve(info);
-                    }
-                    catch (error) {
-                        core.error(`failed to parseContent. err: ${error.message}`);
-                        reject(error);
-                    }
+                catch (error) {
+                    core.error(`failed to parseContent. err: ${error.message}`);
+                    reject(error);
                 }
-            });
-        }
+            }
+        });
     });
 };
-exports.parseFile = parseFile;
+const parseFolder = async (folder) => {
+    const mergedTestSuites = {
+        $: {},
+        testsuite: [],
+    };
+    const files = fs_1.default.readdirSync(folder);
+    for (const file of files) {
+        try {
+            if (file.endsWith('.xml')) {
+                const filePath = `${folder}/${file}`;
+                const testSuiteArray = await getTestsuiteList(filePath);
+                if (testSuiteArray.length === 0) {
+                    core.warning(`No tests found in file: ${filePath}`);
+                }
+                else {
+                    mergedTestSuites.testsuite.push(...testSuiteArray);
+                }
+            }
+        }
+        catch (error) {
+            core.error(`failed to parse folder file: ${folder}/${file}. error: ${error.message}`);
+        }
+    }
+    mergedTestSuites.$ = buildMainContent(mergedTestSuites.testsuite);
+    return unpackage(mergedTestSuites);
+};
+const getTestsuiteList = async (filename) => {
+    try {
+        const testsuiteList = [];
+        const xmlContent = fs_1.default.readFileSync(filename, 'utf8');
+        const parseResult = await xml2js_1.default.parseStringPromise(xmlContent);
+        if (Object.keys(parseResult)?.[0] === 'testsuite') {
+            testsuiteList.push(parseResult.testsuite);
+        }
+        else if (Object.keys(parseResult)?.[0] === 'testsuites') {
+            for (const testsuite of parseResult.testsuites.testsuite) {
+                testsuiteList.push(testsuite);
+            }
+        }
+        return testsuiteList;
+    }
+    catch (error) {
+        core.error(`failed to read file: ${filename}. error: ${error.message}`);
+        return [];
+    }
+};
+const buildMainContent = (testSuiteList) => {
+    const main = {
+        tests: 0,
+        failures: 0,
+        errors: 0,
+        skipped: 0,
+        name: '',
+        time: 0,
+    };
+    for (const testSuite of testSuiteList) {
+        main.tests += +testSuite.$.tests;
+        main.failures += +testSuite.$.failures;
+        main.errors += +testSuite.$.errors;
+        main.skipped += +testSuite.$.skipped;
+        if (main.time < +testSuite.$.time) {
+            main.time = +testSuite.$.time;
+        }
+    }
+    return {
+        tests: `${main.tests}`,
+        failures: `${main.failures}`,
+        errors: `${main.errors}`,
+        skipped: `${main.skipped}`,
+        name: '',
+        time: `${main.time}`,
+    };
+};
 //# sourceMappingURL=junit.js.map
 
 /***/ }),
@@ -1305,7 +1384,7 @@ const parseContent = (str) => {
 function parseFile(file) {
     return new Promise((resolve, reject) => {
         if (!file || file === '') {
-            core.info('no file specified');
+            core.info('no lcov file specified');
             resolve([]);
         }
         else {
