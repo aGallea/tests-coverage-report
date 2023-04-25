@@ -119,7 +119,7 @@ const parseContent = (xml: string): Promise<CoverInfo[]> => {
 export const parseFile = async (file: string): Promise<CoverInfo[]> => {
   return new Promise((resolve, reject) => {
     if (!file || file === '') {
-      core.info('no file specified');
+      core.info('no jacoco file specified');
       resolve([]);
     } else {
       fs.readFile(

@@ -6,7 +6,7 @@ import { parseFile as parseLcovFile } from './parsers/lcov';
 import { parseFile as parseCoberturaFile } from './parsers/cobertura';
 import { parseFile as parseCloverFile } from './parsers/clover';
 import { parseFile as parseJacocoFile } from './parsers/jacoco';
-import { parseFile as parseJunitFile } from './parsers/junit';
+import { parse as parseJunit } from './parsers/junit';
 import { buildBody, commentCoverage } from './commentCoverage';
 import * as core from '@actions/core';
 
@@ -28,7 +28,7 @@ export const main = async (): Promise<void> => {
         eventInfo.diffcoverRef === 'jacoco'
           ? await parseJacocoFile(eventInfo.jacocoPath)
           : [],
-      junit: eventInfo.showJunit ? await parseJunitFile(eventInfo.junitPath) : undefined,
+      junit: eventInfo.showJunit ? await parseJunit(eventInfo.junitPath) : undefined,
     };
     const changedFile = await getChangedFiles(eventInfo);
 

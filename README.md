@@ -81,7 +81,7 @@ Following inputs can be used as `step.with` keys
 | `github-token`     | String | True     |           | GH authentication token                                    |
 | `title`            | String | False    | Tests Report | Title for the comment      |
 | `cobertura-path`   | String | False    | ./coverage/cobertura-coverage.xml | The location of the cobertura coverage xml file |
-| `junit-path`       | String | False    | ./coverage/junit.xml | The location of the junit xml file |
+| `junit-path`       | String | False    | ./coverage/junit.xml | The location of the junit xml file or folder |
 | `jacoco-path`      | String | False    | ./target/site/jacoco/jacoco.xml | The location of the jacoco xml file |
 | `clover-path`      | String | False    | ./coverage/clover.xml | The location of the clover coverage xml file |
 | `lcov-path`        | String | False    | ./coverage/lcov.info | The location of the lcov info file |

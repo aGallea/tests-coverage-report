@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="3" failures="1" name="com.server.ServletTest" time="8.254" errors="0" skipped="2">
+  <properties>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="17.0.3"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor.version" value="Temurin-17.0.3+7"/>
+    <property name="sun.stdout.encoding" value="UTF-8"/>
+  </properties>
+  <testcase classname="com.server.ServletTest" name="testListRequestWithConditions" time="0">
+    <skipped/>
+  </testcase>
+  <testcase classname="com.server.ServletTest" name="testListRequestWithConditions" time="4.127">
+    <failure message="expected:&lt;...2Response(isSuccess=[true]" type="org.junit.ComparisonFailure">org.junit.ComparisonFailure: expected:&lt;...2Response(isSuccess=[true]
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:115)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:75)
+</failure>
+    <system-out>25-04-2023 13:22:24,036 INFO [Version]: [main] [ ] HCANN000001: Hibernate Commons Annotations {4.0.1.Final}
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at org.hibernate.engine.query.spi.HQLQueryPlan.performList(HQLQueryPlan.java:195) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.internal.SessionImpl.list(SessionImpl.java:1248) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.internal.QueryImpl.list(QueryImpl.java:101) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.ejb.QueryImpl.getResultList(QueryImpl.java:256) ~[hibernate-entitymanager-4.1.3.Final.jar:4.1.3.Final]
+	... 37 more
+Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:174) ~[mysql-connector-java-8.0.30.jar:8.0.30]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:64) ~[mysql-connector-java-8.0
+	at org.hibernate.internal.QueryImpl.list(QueryImpl.java:101) ~[hibernate-core-4.1.3.Final.jar:4.1.3.Final]
+	at org.hibernate.ejb.QueryImpl.getResultList(QueryImpl.java:256) ~[hibernate-entitymanager-4.1.3.Final.jar:4.1.3.Final]
+	... 37 more
+</system-out>
+    <system-err>Loading class `com.mysql.jdbc.Driver&apos;. This is deprecated. The new driver class is `com.mysql.cj.jdbc.Driver&apos;. The driver is automatically registered via the SPI and manual loading of the driver class is generally unnecessary.
+</system-err>
+  </testcase>
+  <testcase classname="com.server.ServletTest" name="testListRequestWithoutConditions" time="4.127">
+    <skipped/>
+  </testcase>
+</testsuite>

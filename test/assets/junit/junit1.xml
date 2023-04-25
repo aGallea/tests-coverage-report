@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="2" failures="0" name="com.server.Servlet" time="0.082" errors="0" skipped="2">
+  <properties>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="17.0.3"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor.version" value="Temurin-17.0.3+7"/>
+    <property name="sun.stdout.encoding" value="UTF-8"/>
+  </properties>
+  <testcase classname="com.server.project" name="test1" time="0.041">
+    <skipped/>
+  </testcase>
+  <testcase classname="com.server.project" name="test2" time="0.041">
+    <skipped/>
+  </testcase>
+</testsuite>

@@ -30,7 +30,7 @@ inputs:
     default: ./target/site/jacoco/jacoco.xml
     required: false
   junit-path:
-    description: The location of the junit xml file
+    description: The location of the junit xml file or folder
     default: ./coverage/junit.xml
     required: false
   show-junit:
