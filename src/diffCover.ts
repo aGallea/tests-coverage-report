@@ -51,7 +51,11 @@ const getDiff = async (
           changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
         if (changedLines.length) {
           if (fileCoverInfo.lines.details.length) {
-            if (fileCoverInfo.file === currFile) {
+            if (
+              fileCoverInfo.file === currFile ||
+              currFile.includes(fileCoverInfo.file) ||
+              fileCoverInfo.file.includes(currFile)
+            ) {
               const misses = changedLines.filter(
                 (changedLine: string) =>
                   fileCoverInfo.lines.details.find(

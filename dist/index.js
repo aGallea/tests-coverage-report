@@ -177,7 +177,7 @@ const buildDiffCoverHtml = (eventInfo, diffsInfo) => {
             return `### Coverage Details :ballot_box_with_check:\nNo coverage details to present`;
         }
         else {
-            let html = `<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Lines Covered</th><th>Lines</th></tr>`;
+            let html = `<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr>`;
             let totalLines = 0;
             let totalMissing = 0;
             for (const diffInfo of diffsInfo) {
@@ -303,7 +303,9 @@ const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
                 const changedLines = changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
                 if (changedLines.length) {
                     if (fileCoverInfo.lines.details.length) {
-                        if (fileCoverInfo.file === currFile) {
+                        if (fileCoverInfo.file === currFile ||
+                            currFile.includes(fileCoverInfo.file) ||
+                            fileCoverInfo.file.includes(currFile)) {
                             const misses = changedLines.filter((changedLine) => fileCoverInfo.lines.details.find((details) => details.line === +changedLine)?.hit === 0);
                             core.info(`diffCover on file=${currFile}`);
                             core.info(`misses: [${misses}]`);
