@@ -49,8 +49,15 @@ const getDiff = async (
       if (changedLinesExec.status === 'success') {
         const changedLines =
           changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
+        core.info(`changedLines:[${commitsSha}], currFile:[${currFile}]`);
         if (changedLines.length) {
+          core.info(
+            `fileCoverInfo.lines.details.length:[${fileCoverInfo.lines.details.length}]`,
+          );
           if (fileCoverInfo.lines.details.length) {
+            core.info(
+              `fileCoverInfo.file:[${fileCoverInfo.file}], currFile:[${currFile}]`,
+            );
             if (fileCoverInfo.file === currFile) {
               const misses = changedLines.filter(
                 (changedLine: string) =>
