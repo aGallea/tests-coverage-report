@@ -118,7 +118,7 @@ const buildDiffCoverHtml = (eventInfo: EventInfo, diffsInfo: DiffInfo[]) => {
     if (diffsInfo.length === 0) {
       return `### Coverage Details :ballot_box_with_check:\nNo coverage details to present`;
     } else {
-      let html = `<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Lines Covered</th><th>Lines</th></tr>`;
+      let html = `<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr>`;
       let totalLines = 0;
       let totalMissing = 0;
       for (const diffInfo of diffsInfo) {
