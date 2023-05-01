@@ -306,7 +306,9 @@ const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
                     core.info(`fileCoverInfo.lines.details.length:[${fileCoverInfo.lines.details.length}]`);
                     if (fileCoverInfo.lines.details.length) {
                         core.info(`fileCoverInfo.file:[${fileCoverInfo.file}], currFile:[${currFile}]`);
-                        if (fileCoverInfo.file === currFile) {
+                        if (fileCoverInfo.file === currFile ||
+                            currFile.includes(fileCoverInfo.file) ||
+                            fileCoverInfo.file.includes(currFile)) {
                             const misses = changedLines.filter((changedLine) => fileCoverInfo.lines.details.find((details) => details.line === +changedLine)?.hit === 0);
                             core.info(`diffCover on file=${currFile}`);
                             core.info(`misses: [${misses}]`);
