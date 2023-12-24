@@ -5,6 +5,13 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3](https://github.com/aGallea/tests-coverage-report/compare/1.3.2...1.3.3) (2023-12-24)
+
+
+### Bug Fixes
+
+* release 1.3.3 ([d14ef8f](https://github.com/aGallea/tests-coverage-report/commit/d14ef8f27afe5d7cb80cc0cb395d5d5c366c8acf))
+
 ## [1.3.2](https://github.com/aGallea/tests-coverage-report/compare/1.3.1...1.3.2) (2023-12-24)
 
 
