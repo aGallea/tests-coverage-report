@@ -5,6 +5,14 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.4](https://github.com/aGallea/tests-coverage-report/compare/1.3.3...1.3.4) (2023-12-28)
+
+
+### Bug Fixes
+
+* **ci:** permissions ([40753fc](https://github.com/aGallea/tests-coverage-report/commit/40753fc87e5433e23a9a1069f7056932be0c0020))
+* **ci:** release GH token ([f75adae](https://github.com/aGallea/tests-coverage-report/commit/f75adaea9d7d692383fef37e207d006269659ad1))
+
 ## [1.3.3](https://github.com/aGallea/tests-coverage-report/compare/1.3.2...1.3.3) (2023-12-24)
 
 
