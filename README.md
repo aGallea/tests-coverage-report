@@ -40,17 +40,17 @@ on:
 jobs:
   tests-with-coverage:
     timeout-minutes: 5
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - name: checkout
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
 
-    - name: Use Node.js 18
+    - name: Use Node.js 22
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: 22
         cache: npm
 
     - name: Run Clean Install
