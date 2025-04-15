@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs';
 import { CoverInfo } from '../types';
 import * as core from '@actions/core';

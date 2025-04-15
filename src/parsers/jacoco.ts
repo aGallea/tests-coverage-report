@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs';
 import { CoverInfo } from '../types';
 import parseString from 'xml2js';

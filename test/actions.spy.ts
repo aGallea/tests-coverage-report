@@ -65,6 +65,6 @@ export function spyActions(data = defaultData, eventName = 'pull_request') {
             })),
           },
         },
-      } as any),
+      }) as any,
   );
 }

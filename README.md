@@ -40,17 +40,17 @@ on:
 jobs:
   tests-with-coverage:
     timeout-minutes: 5
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - name: checkout
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
 
-    - name: Use Node.js 18
+    - name: Use Node.js 22
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: 22
         cache: npm
 
     - name: Run Clean Install
@@ -99,6 +99,6 @@ Following inputs can be used as `step.with` keys
 ![alt text](https://github.com/aGallea/tests-coverage-report/blob/master/media/details.png?raw=true)
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[node-version]:https://img.shields.io/badge/nodejs-18.13.0-blue.svg
+[node-version]:https://img.shields.io/badge/nodejs-22.14.0-blue.svg
 [coverage-badge]:https://raw.githubusercontent.com/aGallea/tests-coverage-report/badges/.badges/master/coverage.svg
 [semrel-badge]:https://img.shields.io/badge/semantic--release-1?logo=semantic-release

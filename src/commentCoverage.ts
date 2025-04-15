@@ -24,10 +24,8 @@ export const commentCoverage = async (
         issue_number: payload.pull_request ? payload.pull_request.number : 0,
       });
 
-      const comment = comments.find(
-        (comment) =>
-          comment.user?.login === 'github-actions[bot]' &&
-          comment.body?.startsWith(eventInfo.commentId),
+      const comment = comments.find((comment) =>
+        comment.body?.startsWith(eventInfo.commentId),
       );
 
       if (comment) {
