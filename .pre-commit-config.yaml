@@ -232,7 +232,7 @@ repos:
     types:
     - file
     additional_dependencies:
-    - eslint@8.31.0
+    - eslint@9.24.0
     - eslint-plugin-prettier@4.2.1
     - eslint-config-prettier@8.6.0
     - '@typescript-eslint/eslint-plugin@5.48.0'
