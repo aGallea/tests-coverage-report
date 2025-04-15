@@ -1,12 +1,12 @@
 # yaml-language-server: $schema=https://json.schemastore.org/pre-commit-config.json
 
-minimum_pre_commit_version: 2.20.0
+minimum_pre_commit_version: 4.2.0
 fail_fast: false
 default_stages:
 - commit
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v5.0.0
   hooks:
   - id: check-added-large-files
     exclude: package-lock.json|dist/index.js
@@ -36,7 +36,7 @@ repos:
     exclude: ^media/
   - id: git-check
 - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-  rev: 0.2.2
+  rev: 0.2.3
   hooks:
   - id: yamlfmt
     args:
@@ -51,14 +51,14 @@ repos:
     - --implicit_start
     - --preserve_null
 - repo: https://github.com/adrienverge/yamllint
-  rev: v1.27.1
+  rev: v1.37.0
   hooks:
   - id: yamllint
     name: Lint YAML files
     args:
     - --strict
 - repo: https://github.com/sirosen/check-jsonschema
-  rev: 0.18.4
+  rev: 0.33.0
   hooks:
   - id: check-jsonschema
     name: Validate GitHub Workflows
@@ -139,14 +139,14 @@ repos:
     - --schemafile
     - https://json.schemastore.org/prettierrc
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v2.37.0
+  rev: v4.6.0
   hooks:
   - id: commitizen
     name: Lint commit message
     stages:
     - commit-msg
 - repo: https://github.com/shellcheck-py/shellcheck-py
-  rev: v0.8.0.4
+  rev: v0.10.0.1
   hooks:
   - id: shellcheck
     name: Check sh files (and patch)
@@ -163,14 +163,14 @@ repos:
     stages:
     - manual
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.32.2
+  rev: v0.44.0
   hooks:
   - id: markdownlint-fix
     name: Lint Markdown files
     args:
     - --disable=MD013 # line-length
 - repo: https://github.com/maxwinterstein/shfmt-py
-  rev: v3.4.3.1
+  rev: v3.11.0.2
   hooks:
   - id: shfmt
     name: Format sh files
@@ -189,7 +189,7 @@ repos:
     stages:
     - manual
 - repo: https://github.com/renovatebot/pre-commit-hooks
-  rev: 34.40.0
+  rev: 39.243.0
   hooks:
   - id: renovate-config-validator
     name: Validate Renovate configuration
@@ -225,7 +225,7 @@ repos:
     - --log-opts
     - --left-right --cherry-pick --pretty=format:"%H" remotes/origin/master...
 - repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v8.31.0
+  rev: v9.24.0
   hooks:
   - id: eslint
     files: \.[jt]sx?$      # *.js, *.jsx, *.ts and *.tsx
