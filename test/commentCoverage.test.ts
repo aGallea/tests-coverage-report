@@ -39,7 +39,7 @@ describe('commentCoverage tests', () => {
                 createComment: spyCreateComment,
               },
             },
-          } as any),
+          }) as any,
       );
     });
     beforeEach(() => {
@@ -113,7 +113,7 @@ describe('commentCoverage tests', () => {
                 createComment: spyCreateComment,
               },
             },
-          } as any),
+          }) as any,
       );
       await commentCoverage(eventInfo, 'some-body-content-4');
       expect(spyListCommentsWithContent).toBeCalledWith({
