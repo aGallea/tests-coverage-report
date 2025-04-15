@@ -99,6 +99,6 @@ Following inputs can be used as `step.with` keys
 ![alt text](https://github.com/aGallea/tests-coverage-report/blob/master/media/details.png?raw=true)
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[node-version]:https://img.shields.io/badge/nodejs-18.13.0-blue.svg
+[node-version]:https://img.shields.io/badge/nodejs-22.14.0-blue.svg
 [coverage-badge]:https://raw.githubusercontent.com/aGallea/tests-coverage-report/badges/.badges/master/coverage.svg
 [semrel-badge]:https://img.shields.io/badge/semantic--release-1?logo=semantic-release
