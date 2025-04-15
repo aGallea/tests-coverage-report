@@ -5,6 +5,15 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.5](https://github.com/aGallea/tests-coverage-report/compare/1.3.4...1.3.5) (2025-04-15)
+
+### Bug Fixes
+
+* **comment:** compare only comment header ([d8f8f1e](https://github.com/aGallea/tests-coverage-report/commit/d8f8f1ee3b46363ecadd955e4f2a3a8a00177476))
+* eslint ([29ff0da](https://github.com/aGallea/tests-coverage-report/commit/29ff0da7ea79e18078be76e0e1428e6d18753d83))
+* eslint.config ([49abfd4](https://github.com/aGallea/tests-coverage-report/commit/49abfd4f719b92dca6c6ad745997a7de502a7122))
+* index.js ([76c78bb](https://github.com/aGallea/tests-coverage-report/commit/76c78bb5608725abcc0de3c1a4362d0d4baefc30))
+
 ## [1.3.4](https://github.com/aGallea/tests-coverage-report/compare/1.3.3...1.3.4) (2023-12-28)
 
 
