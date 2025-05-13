@@ -72,7 +72,7 @@ const buildTestsStatusMarkdown = (junitInfo: Junit | undefined) => {
     const markdown =
       junitInfo.failures?.count || junitInfo.errors
         ? '### Tests Failure :x:'
-        : '### Tests Succees :white_check_mark:';
+        : '### Tests Success :white_check_mark:';
     return `${markdown}\n`;
   }
   return '';
