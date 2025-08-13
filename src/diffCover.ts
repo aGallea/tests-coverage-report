@@ -14,6 +14,8 @@ export const diffCover = async (
   coverageInfo: CoverageTypeInfo,
 ): Promise<DiffInfo[]> => {
   if (eventInfo.showDiffcover) {
+    core.info(`getting git log`);
+    core.info(`baseRef: ${eventInfo.baseRef}, headRef: ${eventInfo.headRef}`);
     const gitLogCommand = `git log --oneline origin/${eventInfo.baseRef}..origin/${eventInfo.headRef} -- | cut -f1 -d' '`;
     const gitLogExec = await execCommand(gitLogCommand);
     if (gitLogExec.status !== 'success') {
@@ -21,6 +23,7 @@ export const diffCover = async (
         `failed to retrieve git log: ${eventInfo.baseRef}..${eventInfo.headRef}. error: ${gitLogExec.message}`,
       );
     }
+    core.info(`getting commitSha`);
     const commitsSha = gitLogExec.stdout?.split('\n').filter((sha) => sha) || [];
     core.info(`commitsSha list:[${commitsSha}]`);
     const changedFiles = [

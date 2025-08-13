@@ -12,7 +12,9 @@ import * as core from '@actions/core';
 
 export const main = async (): Promise<void> => {
   try {
+    core.info(`getting event info`);
     const eventInfo: EventInfo = getEventInfo();
+    core.info(`getting coverage info`);
     const coverageInfo: CoverageTypeInfo = {
       cobertura:
         eventInfo.diffcoverRef === 'cobertura'
@@ -30,9 +32,12 @@ export const main = async (): Promise<void> => {
           : [],
       junit: eventInfo.showJunit ? await parseJunit(eventInfo.junitPath) : undefined,
     };
+    core.info(`getting changed files`);
     const changedFile = await getChangedFiles(eventInfo);
 
+    core.info(`getting diffCover`);
     const diffInfo: DiffInfo[] = await diffCover(eventInfo, changedFile, coverageInfo);
+    core.info(`commenting coverage`);
     await commentCoverage(eventInfo, buildBody(eventInfo, coverageInfo.junit, diffInfo));
   } catch (error) {
     core.setFailed(error.message);

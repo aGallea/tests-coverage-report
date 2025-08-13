@@ -276,11 +276,14 @@ const utils_1 = __nccwpck_require__(1507);
 const core = __importStar(__nccwpck_require__(2186));
 const diffCover = async (eventInfo, filesStatus, coverageInfo) => {
     if (eventInfo.showDiffcover) {
+        core.info(`getting git log`);
+        core.info(`baseRef: ${eventInfo.baseRef}, headRef: ${eventInfo.headRef}`);
         const gitLogCommand = `git log --oneline origin/${eventInfo.baseRef}..origin/${eventInfo.headRef} -- | cut -f1 -d' '`;
         const gitLogExec = await (0, utils_1.execCommand)(gitLogCommand);
         if (gitLogExec.status !== 'success') {
             throw new Error(`failed to retrieve git log: ${eventInfo.baseRef}..${eventInfo.headRef}. error: ${gitLogExec.message}`);
         }
+        core.info(`getting commitSha`);
         const commitsSha = gitLogExec.stdout?.split('\n').filter((sha) => sha) || [];
         core.info(`commitsSha list:[${commitsSha}]`);
         const changedFiles = [
@@ -488,7 +491,9 @@ const commentCoverage_1 = __nccwpck_require__(4533);
 const core = __importStar(__nccwpck_require__(2186));
 const main = async () => {
     try {
+        core.info(`getting event info`);
         const eventInfo = (0, eventInfo_1.getEventInfo)();
+        core.info(`getting coverage info`);
         const coverageInfo = {
             cobertura: eventInfo.diffcoverRef === 'cobertura'
                 ? await (0, cobertura_1.parseFile)(eventInfo.coberturaPath, `${eventInfo.pwd}/`)
@@ -502,8 +507,11 @@ const main = async () => {
                 : [],
             junit: eventInfo.showJunit ? await (0, junit_1.parse)(eventInfo.junitPath) : undefined,
         };
+        core.info(`getting changed files`);
         const changedFile = await (0, changedFiles_1.getChangedFiles)(eventInfo);
+        core.info(`getting diffCover`);
         const diffInfo = await (0, diffCover_1.diffCover)(eventInfo, changedFile, coverageInfo);
+        core.info(`commenting coverage`);
         await (0, commentCoverage_1.commentCoverage)(eventInfo, (0, commentCoverage_1.buildBody)(eventInfo, coverageInfo.junit, diffInfo));
     }
     catch (error) {
