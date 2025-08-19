@@ -39,7 +39,7 @@ jobs:
         extra_args: --from-ref ${{ github.event.pull_request.base.sha }} --to-ref ${{ github.event.pull_request.head.sha }}
 
     - name: Semantic pull-request
-      uses: amannn/action-semantic-pull-request@v5.4.0
+      uses: amannn/action-semantic-pull-request@v6.1.0
       with:
         requireScope: false
         wip: true
