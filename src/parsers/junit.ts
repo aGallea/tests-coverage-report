@@ -17,6 +17,21 @@ const unpackage = (testsuites: any): Junit => {
       ?.map((test: any) => +test['$'].skipped)
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
+  const tests =
+    testsuite
+      ?.map((test: any) => +test['$'].tests)
+      .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
+
+  const failures =
+    testsuite
+      ?.map((test: any) => +test['$'].failures)
+      .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
+
+  const time =
+    testsuite
+      ?.map((test: any) => +test['$'].time)
+      .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
+
   const testSuiteFailures = testsuite?.filter((test: any) => +test['$'].failures > 0);
   const failureCase: JunitFailureInfo[] | undefined = testSuiteFailures
     .map((testSuiteFailure: any) => {
@@ -33,14 +48,14 @@ const unpackage = (testsuites: any): Junit => {
     .flat();
 
   return {
-    tests: +main.tests,
+    tests: +main.tests || tests,
     failures: {
-      count: +main.failures,
+      count: +main.failures || failures,
       info: failureCase,
     },
     errors: +main.errors || errors,
-    skipped,
-    time: `${parseFloat(main.time).toFixed(2)}s`,
+    skipped: +main.skipped || skipped,
+    time: `${(parseFloat(main.time) || time).toFixed(2)}s`,
   };
 };
 
