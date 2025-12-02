@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites name="root">
+  <testsuite name="child1" tests="5" time="0.1" />
+  <testsuite name="child2" /> <!-- missing stats -->
+</testsuites>
