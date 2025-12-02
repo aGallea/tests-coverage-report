@@ -3,33 +3,43 @@ import { Junit, JunitFailureInfo } from '../types';
 import parseString from 'xml2js';
 import * as core from '@actions/core';
 
+const safeParseInt = (val: any): number => {
+  const parsed = parseInt(val, 10);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
+const safeParseFloat = (val: any): number => {
+  const parsed = parseFloat(val);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 const unpackage = (testsuites: any): Junit => {
-  const main = testsuites['$'] || testsuites.testsuite[0]['$'];
+  const main = testsuites['$'] || {};
   const testsuite: any[] = testsuites.testsuite;
 
   const errors =
     testsuite
-      ?.map((test: any) => +test['$'].errors)
+      ?.map((test: any) => safeParseInt(test['$'].errors))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const skipped =
     testsuite
-      ?.map((test: any) => +test['$'].skipped)
+      ?.map((test: any) => safeParseInt(test['$'].skipped))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const tests =
     testsuite
-      ?.map((test: any) => +test['$'].tests)
+      ?.map((test: any) => safeParseInt(test['$'].tests))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const failures =
     testsuite
-      ?.map((test: any) => +test['$'].failures)
+      ?.map((test: any) => safeParseInt(test['$'].failures))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const time =
     testsuite
-      ?.map((test: any) => +test['$'].time)
+      ?.map((test: any) => safeParseFloat(test['$'].time))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const testSuiteFailures = testsuite?.filter((test: any) => +test['$'].failures > 0);
@@ -48,14 +58,14 @@ const unpackage = (testsuites: any): Junit => {
     .flat();
 
   return {
-    tests: +main.tests || tests,
+    tests: safeParseInt(main.tests) || tests,
     failures: {
-      count: +main.failures || failures,
+      count: safeParseInt(main.failures) || failures,
       info: failureCase,
     },
-    errors: +main.errors || errors,
-    skipped: +main.skipped || skipped,
-    time: `${(parseFloat(main.time) || time).toFixed(2)}s`,
+    errors: safeParseInt(main.errors) || errors,
+    skipped: safeParseInt(main.skipped) || skipped,
+    time: `${(safeParseFloat(main.time) || time).toFixed(2)}s`,
   };
 };
 

@@ -1074,14 +1074,31 @@ exports.parse = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const xml2js_1 = __importDefault(__nccwpck_require__(6189));
 const core = __importStar(__nccwpck_require__(2186));
+const safeParseInt = (val) => {
+    const parsed = parseInt(val, 10);
+    return isNaN(parsed) ? 0 : parsed;
+};
+const safeParseFloat = (val) => {
+    const parsed = parseFloat(val);
+    return isNaN(parsed) ? 0 : parsed;
+};
 const unpackage = (testsuites) => {
-    const main = testsuites['$'] || testsuites.testsuite[0]['$'];
+    const main = testsuites['$'] || {};
     const testsuite = testsuites.testsuite;
     const errors = testsuite
-        ?.map((test) => +test['$'].errors)
+        ?.map((test) => safeParseInt(test['$'].errors))
         .reduce((acc, curr) => acc + curr, 0) || 0;
     const skipped = testsuite
-        ?.map((test) => +test['$'].skipped)
+        ?.map((test) => safeParseInt(test['$'].skipped))
+        .reduce((acc, curr) => acc + curr, 0) || 0;
+    const tests = testsuite
+        ?.map((test) => safeParseInt(test['$'].tests))
+        .reduce((acc, curr) => acc + curr, 0) || 0;
+    const failures = testsuite
+        ?.map((test) => safeParseInt(test['$'].failures))
+        .reduce((acc, curr) => acc + curr, 0) || 0;
+    const time = testsuite
+        ?.map((test) => safeParseFloat(test['$'].time))
         .reduce((acc, curr) => acc + curr, 0) || 0;
     const testSuiteFailures = testsuite?.filter((test) => +test['$'].failures > 0);
     const failureCase = testSuiteFailures
@@ -1096,14 +1113,14 @@ const unpackage = (testsuites) => {
     })
         .flat();
     return {
-        tests: +main.tests,
+        tests: safeParseInt(main.tests) || tests,
         failures: {
-            count: +main.failures,
+            count: safeParseInt(main.failures) || failures,
             info: failureCase,
         },
-        errors: +main.errors || errors,
-        skipped,
-        time: `${parseFloat(main.time).toFixed(2)}s`,
+        errors: safeParseInt(main.errors) || errors,
+        skipped: safeParseInt(main.skipped) || skipped,
+        time: `${(safeParseFloat(main.time) || time).toFixed(2)}s`,
     };
 };
 const getTestFailureMessage = (testCaseFailure) => {
