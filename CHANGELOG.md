@@ -5,6 +5,12 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.6](https://github.com/aGallea/tests-coverage-report/compare/1.3.5...1.3.6) (2025-12-02)
+
+### Bug Fixes
+
+* **junit:** child counters ([f19b4cc](https://github.com/aGallea/tests-coverage-report/commit/f19b4cc116dc903da3652390907166589b810827))
+
 ## [1.3.5](https://github.com/aGallea/tests-coverage-report/compare/1.3.4...1.3.5) (2025-04-15)
 
 ### Bug Fixes
