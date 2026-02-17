@@ -271,13 +271,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.diffCover = void 0;
+exports.parseBlameForCommits = exports.diffCover = void 0;
 const utils_1 = __nccwpck_require__(1507);
 const core = __importStar(__nccwpck_require__(2186));
 const diffCover = async (eventInfo, filesStatus, coverageInfo) => {
     if (eventInfo.showDiffcover) {
-        const gitLogCommand = `git log --oneline origin/${eventInfo.baseRef}..origin/${eventInfo.headRef} -- | cut -f1 -d' '`;
-        const gitLogExec = await (0, utils_1.execCommand)(gitLogCommand);
+        const gitLogExec = await (0, utils_1.execFileCommand)('git', [
+            'log',
+            '--format=%h',
+            `origin/${eventInfo.baseRef}..origin/${eventInfo.headRef}`,
+            '--',
+        ]);
         if (gitLogExec.status !== 'success') {
             throw new Error(`failed to retrieve git log: ${eventInfo.baseRef}..${eventInfo.headRef}. error: ${gitLogExec.message}`);
         }
@@ -293,13 +297,31 @@ const diffCover = async (eventInfo, filesStatus, coverageInfo) => {
     return [];
 };
 exports.diffCover = diffCover;
+const parseBlameForCommits = (blameOutput, commitSet) => {
+    const lines = [];
+    const blameLineRegex = /^([0-9a-f]{40})\s+\d+\s+(\d+)(?:\s+\d+)?$/;
+    for (const line of blameOutput.split('\n')) {
+        const match = blameLineRegex.exec(line);
+        if (match) {
+            const fullSha = match[1];
+            const lineNumber = match[2];
+            const shortSha = fullSha.substring(0, 7);
+            if (commitSet.has(shortSha) || commitSet.has(fullSha)) {
+                lines.push(lineNumber);
+            }
+        }
+    }
+    return lines;
+};
+exports.parseBlameForCommits = parseBlameForCommits;
 const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
+    const commitSet = new Set(commitsSha);
     const diffInfo = [];
     for (const fileCoverInfo of coverageInfo[referral]) {
         for (const currFile of changedFiles) {
-            const changedLinesExec = await (0, utils_1.execCommand)(`git blame ${currFile} | grep -n '${commitsSha.join('\\|')}' | cut -f1 -d:`);
+            const changedLinesExec = await (0, utils_1.execFileCommand)('git', ['blame', '-p', currFile]);
             if (changedLinesExec.status === 'success') {
-                const changedLines = changedLinesExec.stdout?.split('\n').filter((line) => line) || [];
+                const changedLines = (0, exports.parseBlameForCommits)(changedLinesExec.stdout || '', commitSet);
                 if (changedLines.length) {
                     if (fileCoverInfo.lines.details.length) {
                         if (fileCoverInfo.file === currFile ||
@@ -321,7 +343,6 @@ const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
             else {
                 throw new Error(`failed to execute "git blame" on file: ${currFile}. error: ${changedLinesExec.message}`);
             }
-            // core.info(changedLinesExec.stdout);
         }
     }
     return diffInfo;
@@ -1456,7 +1477,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.execCommand = void 0;
+exports.execFileCommand = exports.execCommand = void 0;
 const node_child_process_1 = __nccwpck_require__(7718);
 const core = __importStar(__nccwpck_require__(2186));
 const execCommand = async (command) => {
@@ -1478,6 +1499,25 @@ const execCommand = async (command) => {
     });
 };
 exports.execCommand = execCommand;
+const execFileCommand = async (file, args) => {
+    return new Promise((resolve) => {
+        (0, node_child_process_1.execFile)(file, args, (error, stdout) => {
+            if (error) {
+                core.error(`could not execute command: ${file} ${args.join(' ')}. error: ${error.message}`);
+                return resolve({
+                    status: 'error',
+                    message: error.message,
+                    errorCode: typeof error.code === 'number' ? error.code : undefined,
+                });
+            }
+            resolve({
+                status: 'success',
+                stdout,
+            });
+        });
+    });
+};
+exports.execFileCommand = execFileCommand;
 //# sourceMappingURL=utils.js.map
 
 /***/ }),
@@ -2053,8 +2093,8 @@ class OidcClient {
             const res = yield httpclient
                 .getJson(id_token_url)
                 .catch(error => {
-                throw new Error(`Failed to get ID Token. \n
-        Error Code : ${error.statusCode}\n
+                throw new Error(`Failed to get ID Token. \n 
+        Error Code : ${error.statusCode}\n 
         Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -42553,7 +42593,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -42567,7 +42607,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -42576,23 +42616,23 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
-/******/
+/******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/
+/******/ 	
 /************************************************************************/
-/******/
+/******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __nccwpck_require__(6345);
 /******/ 	module.exports = __webpack_exports__;
-/******/
+/******/ 	
 /******/ })()
 ;
