@@ -5,4 +5,5 @@ export default {
   testMatch: ['**/test/integration/**/*.test.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   testTimeout: 120000,
+  setupFiles: ['./test/integration/setup.ts'],
 };
