@@ -2,7 +2,7 @@ import { spyActions } from './actions.spy';
 import * as github from '@actions/github';
 import { CoverageTypeInfo, EventInfo, FilesStatus, DiffInfo } from '../src/types';
 import { getEventInfo } from '../src/eventInfo';
-import { diffCover } from '../src/diffCover';
+import { diffCover, parseBlameForCommits } from '../src/diffCover';
 import { parseFile } from '../src/parsers/cobertura';
 import * as Utils from '../src/utils';
 
@@ -58,6 +58,9 @@ describe('diffCover tests', () => {
       const eventInfo: EventInfo = getEventInfo();
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
+      jest
+        .spyOn(Utils, 'execFileCommand')
+        .mockResolvedValue({ status: 'success', stdout: '' });
       const cobertura = await parseFile(
         './test/assets/cobertura-coverage.xml',
         '/Users/user/workspace/private/tests-coverage-report/',
@@ -83,6 +86,9 @@ describe('diffCover tests', () => {
       const eventInfo: EventInfo = getEventInfo();
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
+      jest
+        .spyOn(Utils, 'execFileCommand')
+        .mockResolvedValue({ status: 'success', stdout: '' });
       const cobertura = await parseFile(
         './test/assets/cobertura-coverage.xml',
         '/Users/user/workspace/private/tests-coverage-report/',
@@ -104,25 +110,40 @@ describe('diffCover tests', () => {
     });
     test('with changed lines', async () => {
       jest
-        .spyOn(Utils, 'execCommand')
-        .mockImplementation(async (command: string): Promise<Utils.ExecInfo> => {
-          if (command.includes('src/main.ts')) {
-            return {
-              status: 'success',
-              stdout: '1\n2\n3\n4\n10\n11\n12\n13\n17\n18\n19\n20\n21\n22\n29\n30\n',
-            };
-          } else if (command.includes('src/diffCover.ts')) {
-            return {
-              status: 'success',
-              stdout:
-                '1\n2\n3\n4\n5\n51\n52\n53\n54\n72\n73\n74\n78\n79\n80\n81\n82\n83\n',
-            };
-          }
-          return {
-            status: 'success',
-            stdout: '',
-          };
-        });
+        .spyOn(Utils, 'execFileCommand')
+        .mockImplementation(
+          async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+            if (args[0] === 'log') {
+              return {
+                status: 'success',
+                stdout: 'abc1234\ndef5678\n',
+              };
+            }
+            if (args[0] === 'blame' && args.includes('src/main.ts')) {
+              const blameLines = [
+                1, 2, 3, 4, 10, 11, 12, 13, 17, 18, 19, 20, 21, 22, 29, 30,
+              ];
+              return {
+                status: 'success',
+                stdout: blameLines
+                  .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                  .join('\n'),
+              };
+            }
+            if (args[0] === 'blame' && args.includes('src/diffCover.ts')) {
+              const blameLines = [
+                1, 2, 3, 4, 5, 51, 52, 53, 54, 72, 73, 74, 78, 79, 80, 81, 82, 83,
+              ];
+              return {
+                status: 'success',
+                stdout: blameLines
+                  .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                  .join('\n'),
+              };
+            }
+            return { status: 'success', stdout: '' };
+          },
+        );
       const eventInfo: EventInfo = getEventInfo();
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
@@ -210,7 +231,7 @@ describe('diffCover tests', () => {
   describe('Exceptions', () => {
     test('invalid git log', async () => {
       const eventInfo: EventInfo = getEventInfo();
-      jest.spyOn(Utils, 'execCommand').mockImplementation(
+      jest.spyOn(Utils, 'execFileCommand').mockImplementation(
         async (): Promise<Utils.ExecInfo> => ({
           status: 'error',
           message: 'some error message',
@@ -234,20 +255,22 @@ describe('diffCover tests', () => {
     test('invalid git blame', async () => {
       const eventInfo: EventInfo = getEventInfo();
       jest
-        .spyOn(Utils, 'execCommand')
-        .mockImplementation(async (command: string): Promise<Utils.ExecInfo> => {
-          if (command.includes('blame')) {
+        .spyOn(Utils, 'execFileCommand')
+        .mockImplementation(
+          async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+            if (args[0] === 'blame') {
+              return {
+                status: 'error',
+                message: 'git blame error message',
+                errorCode: 1,
+              };
+            }
             return {
-              status: 'error',
-              message: 'git blame error message',
-              errorCode: 1,
+              status: 'success',
+              stdout: '',
             };
-          }
-          return {
-            status: 'success',
-            stdout: '',
-          };
-        });
+          },
+        );
       eventInfo.showDiffcover = true;
       eventInfo.diffcoverRef = 'cobertura';
       const cobertura = await parseFile(
@@ -268,5 +291,51 @@ describe('diffCover tests', () => {
         'failed to execute "git blame" on file: src/diffCover.ts. error: git blame error message',
       );
     });
+  });
+});
+
+describe('parseBlameForCommits', () => {
+  test('extracts matching line numbers', () => {
+    const blameOutput = [
+      'abc1234000000000000000000000000000000000 1 1 1',
+      'author Test User',
+      'def5678000000000000000000000000000000000 2 2 1',
+      'author Test User',
+      'abc1234000000000000000000000000000000000 3 3 1',
+      'author Test User',
+    ].join('\n');
+    const commitSet = new Set(['abc1234']);
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual(['1', '3']);
+  });
+
+  test('returns empty for no matches', () => {
+    const blameOutput = [
+      'abc1234000000000000000000000000000000000 1 1 1',
+      'author Test User',
+    ].join('\n');
+    const commitSet = new Set(['zzz9999']);
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual([]);
+  });
+
+  test('handles empty blame output', () => {
+    const result = parseBlameForCommits('', new Set(['abc1234']));
+    expect(result).toEqual([]);
+  });
+
+  test('matches full 40-char SHA', () => {
+    const fullSha = 'abc1234000000000000000000000000000000000';
+    const blameOutput = `${fullSha} 5 5 1`;
+    const commitSet = new Set([fullSha]);
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual(['5']);
+  });
+
+  test('matches short 7-char SHA', () => {
+    const blameOutput = 'abc1234000000000000000000000000000000000 10 10 1';
+    const commitSet = new Set(['abc1234']);
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual(['10']);
   });
 });
