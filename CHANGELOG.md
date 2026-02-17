@@ -5,6 +5,14 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.8](https://github.com/aGallea/tests-coverage-report/compare/1.3.7...1.3.8) (2026-02-17)
+
+### Bug Fixes
+
+* **security:** add shell-safe execFileCommand using child_process.execFile ([5b2f3e5](https://github.com/aGallea/tests-coverage-report/commit/5b2f3e5786bca7e0caa8253e2d856773b8dd1814))
+* **security:** migrate diffCover to safe exec, eliminate shell injection ([b556e2f](https://github.com/aGallea/tests-coverage-report/commit/b556e2f4f904546f8e237fea1e93e749dff96d4b))
+* upgrade GitHub Action runtime from node16 to node20 ([cfa75eb](https://github.com/aGallea/tests-coverage-report/commit/cfa75eb2047c6b7d7998e64bc4f6f4fd5fe15e64))
+
 ## [1.3.7](https://github.com/aGallea/tests-coverage-report/compare/1.3.6...1.3.7) (2025-12-02)
 
 ### Bug Fixes
