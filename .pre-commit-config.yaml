@@ -128,7 +128,8 @@ repos:
     args:
     - --schemafile
     - https://docs.renovatebot.com/renovate-schema.json
-    - --disable-format
+    - --disable-formats
+    - '*'
   - id: check-jsonschema
     name: Validate Prettier
     files: ^\.prettierrc(\.(json|yaml|yml|json5))?
