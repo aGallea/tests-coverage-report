@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --silent",
+    "test:integration": "jest --config jest.integration.config.ts --silent",
+    "test:smoke": "jest --config jest.integration.config.ts --testPathPattern='smoke' --silent",
+    "test:e2e": "jest --config jest.integration.config.ts --testPathPattern='action' --silent",
     "prebuild": "npm run lint",
     "build": "tsc",
     "prepackage": "npm run build",
@@ -38,6 +41,8 @@
   "homepage": "https://github.com/aGallea/tests-coverage-report#readme",
   "devDependencies": {
     "@eslint/js": "^9.24.0",
+    "@kie/act-js": "^2.6.2",
+    "@kie/mock-github": "^2.0.1",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
