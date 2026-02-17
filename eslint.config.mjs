@@ -5,7 +5,7 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default tseslint.config(
   {
-    ignores: ['dist/', 'node_modules/', 'jest.config.ts'],
+    ignores: ['dist/', 'node_modules/', 'jest.config.ts', '.releaserc.js', 'jest.integration.config.ts'],
   },
   js.configs.recommended,
   {

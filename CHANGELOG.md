@@ -1,5 +1,5 @@
 <!-- markdownlint-configure-file {"MD024": { "siblings_only": true }, "MD012": false } -->
-  # Changelog
+# Changelog
 
   All notable changes to this project will be documented in this file.
 
