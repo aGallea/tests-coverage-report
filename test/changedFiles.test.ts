@@ -74,4 +74,43 @@ describe('eventInput tests', () => {
     expect(filesStatus.removed).toHaveLength(1);
     expect(filesStatus.removed[0]).toEqual('7.file');
   });
+
+  test('getChangedFiles paginates by file count, not commit count', async () => {
+    const page1Files = Array.from({ length: 50 }, (_, i) => ({
+      status: 'added',
+      filename: `page1-${i}.file`,
+    }));
+    const page2Files = Array.from({ length: 10 }, (_, i) => ({
+      status: 'modified',
+      filename: `page2-${i}.file`,
+    }));
+
+    const mockCompare = jest
+      .fn()
+      .mockResolvedValueOnce({
+        data: { total_commits: 1, files: page1Files },
+      })
+      .mockResolvedValueOnce({
+        data: { total_commits: 1, files: page2Files },
+      });
+
+    jest.spyOn(github, 'getOctokit').mockImplementation(
+      () =>
+        ({
+          rest: {
+            repos: {
+              compareCommitsWithBasehead: mockCompare,
+            },
+          },
+        }) as any,
+    );
+
+    const eventInfo: EventInfo = getEventInfo();
+    const filesStatus: FilesStatus = await getChangedFiles(eventInfo);
+
+    expect(filesStatus.all).toHaveLength(60);
+    expect(filesStatus.added).toHaveLength(50);
+    expect(filesStatus.modified).toHaveLength(10);
+    expect(mockCompare).toHaveBeenCalledTimes(2);
+  });
 });
