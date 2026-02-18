@@ -8,10 +8,8 @@ const parseDiffcoverRef = (input: string): DiffCoverRef => {
   if (VALID_DIFFCOVER_REFS.includes(input as DiffCoverRef)) {
     return input as DiffCoverRef;
   }
-  if (input && input !== '') {
-    core.warning(
-      `Invalid diffcover-ref value: '${input}'. Valid values: ${VALID_DIFFCOVER_REFS.join(', ')}. Defaulting to 'cobertura'.`,
-    );
+  if (input) {
+    core.warning(`Invalid diffcover-ref: '${input}'. Defaulting to 'cobertura'.`);
   }
   return 'cobertura';
 };

@@ -389,8 +389,8 @@ const parseDiffcoverRef = (input) => {
     if (VALID_DIFFCOVER_REFS.includes(input)) {
         return input;
     }
-    if (input && input !== '') {
-        core.warning(`Invalid diffcover-ref value: '${input}'. Valid values: ${VALID_DIFFCOVER_REFS.join(', ')}. Defaulting to 'cobertura'.`);
+    if (input) {
+        core.warning(`Invalid diffcover-ref: '${input}'. Defaulting to 'cobertura'.`);
     }
     return 'cobertura';
 };
