@@ -1,4 +1,17 @@
 <!-- markdownlint-configure-file {"MD024": { "siblings_only": true }, "MD012": false } -->
+  # Changelog
+
+  All notable changes to this project will be documented in this file.
+
+  The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.3.9](https://github.com/aGallea/tests-coverage-report/compare/1.3.8...1.3.9) (2026-02-18)
+
+### Bug Fixes
+
+* increase maxBuffer to 10MB for exec and execFile ([f82df14](https://github.com/aGallea/tests-coverage-report/commit/f82df1414d3ac8127b4e9f030bf0e57b777f1ee8))
+
+<!-- markdownlint-configure-file {"MD024": { "siblings_only": true }, "MD012": false } -->
 # Changelog
 
   All notable changes to this project will be documented in this file.
