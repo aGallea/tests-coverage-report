@@ -32,7 +32,7 @@ export function spyActions(data = defaultData, eventName = 'pull_request') {
   jest.spyOn(core, 'warning').mockImplementation(jest.fn());
   jest.spyOn(core, 'info').mockImplementation(jest.fn());
   jest.spyOn(core, 'debug').mockImplementation(jest.fn());
-  // jest.spyOn(core, 'setFailed').mockImplementation(jest.fn());
+  jest.spyOn(core, 'setFailed').mockImplementation(jest.fn());
 
   jest.spyOn(github.context, 'repo', 'get').mockImplementation(() => {
     return {

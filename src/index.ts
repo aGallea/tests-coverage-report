@@ -6,5 +6,5 @@ main()
     core.info('success');
   })
   .catch((err) => {
-    core.error(`exception. ${err.message}`);
+    core.setFailed(`exception. ${err.message}`);
   });
