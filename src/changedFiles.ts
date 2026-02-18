@@ -30,7 +30,10 @@ export const getChangedFiles = async (eventInfo: EventInfo): Promise<FilesStatus
     if (files) {
       for (const file of files) {
         allFiles.all.push(file.filename);
-        allFiles[`${file.status}`].push(file.filename);
+        const status = `${file.status}` as keyof FilesStatus;
+        if (status !== 'all' && status in allFiles) {
+          allFiles[status].push(file.filename);
+        }
       }
     }
     hasMorePages = (files?.length ?? 0) >= perPage;

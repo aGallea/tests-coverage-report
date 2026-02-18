@@ -113,4 +113,34 @@ describe('eventInput tests', () => {
     expect(filesStatus.modified).toHaveLength(10);
     expect(mockCompare).toHaveBeenCalledTimes(2);
   });
+
+  test('getChangedFiles skips files with unknown status', async () => {
+    const mockCompare = jest.fn().mockResolvedValueOnce({
+      data: {
+        total_commits: 1,
+        files: [
+          { status: 'added', filename: 'known.file' },
+          { status: 'unknown_status', filename: 'unknown.file' },
+        ],
+      },
+    });
+
+    jest.spyOn(github, 'getOctokit').mockImplementation(
+      () =>
+        ({
+          rest: {
+            repos: {
+              compareCommitsWithBasehead: mockCompare,
+            },
+          },
+        }) as any,
+    );
+
+    const eventInfo: EventInfo = getEventInfo();
+    const filesStatus: FilesStatus = await getChangedFiles(eventInfo);
+
+    expect(filesStatus.all).toHaveLength(2);
+    expect(filesStatus.added).toHaveLength(1);
+    expect(filesStatus.added[0]).toEqual('known.file');
+  });
 });
