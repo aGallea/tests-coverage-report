@@ -2,7 +2,7 @@
 
 > Generated: 2026-02-17
 > Last updated: 2026-02-18
-> Status: P0 complete (PR #63 merged). P1-2 through P1-5 complete. P1-1, P2, P3 pending.
+> Status: P0 complete (PR #63 merged). P1 complete. P2, P3 pending.
 > Usage: Check off items as they are implemented. Reference item IDs when requesting fixes.
 
 ---
@@ -29,7 +29,7 @@
 
 ## P1 — High Priority
 
-### [ ] P1-1: Upgrade outdated npm dependencies
+### [x] P1-1: Upgrade outdated npm dependencies
 
 - **File**: `package.json`
 - **Issue**: 23 outdated packages, 27 vulnerabilities (4 low, 11 moderate, 12 high). Key upgrades:
@@ -41,6 +41,7 @@
   - `jest` 29.7.0 (current, but `ts-jest` and `@types/jest` need bumps)
 - **Fix**: Run `npm update` for minor/patch, then manually upgrade majors with testing.
 - **Risk**: High for `@actions/github` major bump (API changes). Low-medium for others.
+- **Done**: `fix: upgrade @actions/github to v6 and xml2js to v0.6` + `chore: update dev dependencies` + `chore: upgrade @vercel/ncc from 0.36 to 0.38`. Conservative approach — skipped ESM-only packages (@actions/core v3, @actions/github v9). Remaining vulns are in dev-only transitive deps (eslint/ajv, semantic-release/npm/tar).
 
 ### [x] P1-2: Fix pagination bug in `changedFiles.ts`
 

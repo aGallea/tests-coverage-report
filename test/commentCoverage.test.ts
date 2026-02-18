@@ -49,7 +49,7 @@ describe('commentCoverage tests', () => {
     test('createCommitComment with push event', async () => {
       github.context.eventName = 'push';
       await commentCoverage(eventInfo, 'some-body-content-1');
-      expect(spyCreateCommitComment).toBeCalledWith({
+      expect(spyCreateCommitComment).toHaveBeenCalledWith({
         body: 'some-body-content-1',
         commit_sha: 'abcdefghijklmnopqrstuvwxyz',
         owner: 'some-owner',
@@ -59,7 +59,7 @@ describe('commentCoverage tests', () => {
     test('createComment with pull_request event', async () => {
       github.context.eventName = 'pull_request';
       await commentCoverage(eventInfo, 'some-body-content-2');
-      expect(spyCreateComment).toBeCalledWith({
+      expect(spyCreateComment).toHaveBeenCalledWith({
         body: 'some-body-content-2',
         issue_number: 1,
         owner: 'some-owner',
@@ -70,12 +70,12 @@ describe('commentCoverage tests', () => {
       github.context.eventName = 'pull_request';
       eventInfo.overrideComment = true;
       await commentCoverage(eventInfo, 'some-body-content-3');
-      expect(spyListComments).toBeCalledWith({
+      expect(spyListComments).toHaveBeenCalledWith({
         repo: 'some-repo',
         owner: 'some-owner',
         issue_number: 1,
       });
-      expect(spyCreateComment).toBeCalledWith({
+      expect(spyCreateComment).toHaveBeenCalledWith({
         body: 'some-body-content-3',
         issue_number: 1,
         owner: 'some-owner',
@@ -116,12 +116,12 @@ describe('commentCoverage tests', () => {
           }) as any,
       );
       await commentCoverage(eventInfo, 'some-body-content-4');
-      expect(spyListCommentsWithContent).toBeCalledWith({
+      expect(spyListCommentsWithContent).toHaveBeenCalledWith({
         repo: 'some-repo',
         owner: 'some-owner',
         issue_number: 1,
       });
-      expect(spyUpdateComment).toBeCalledWith({
+      expect(spyUpdateComment).toHaveBeenCalledWith({
         body: 'some-body-content-4',
         comment_id: 51,
         owner: 'some-owner',
