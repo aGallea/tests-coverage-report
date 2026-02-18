@@ -5,6 +5,12 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.10](https://github.com/aGallea/tests-coverage-report/compare/1.3.9...1.3.10) (2026-02-18)
+
+### Bug Fixes
+
+* P1 bugfixes — pagination, clover forEach, setFailed, diffcoverRef validation ([#65](https://github.com/aGallea/tests-coverage-report/issues/65)) ([6831291](https://github.com/aGallea/tests-coverage-report/commit/683129150539f67d93b628d6668f9314d48713d4))
+
 ## [1.3.9](https://github.com/aGallea/tests-coverage-report/compare/1.3.8...1.3.9) (2026-02-18)
 
 ### Bug Fixes
