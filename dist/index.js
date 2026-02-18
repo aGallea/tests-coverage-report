@@ -1480,9 +1480,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.execFileCommand = exports.execCommand = void 0;
 const node_child_process_1 = __nccwpck_require__(7718);
 const core = __importStar(__nccwpck_require__(2186));
+const MAX_BUFFER = 10 * 1024 * 1024;
 const execCommand = async (command) => {
     return new Promise((resolve) => {
-        (0, node_child_process_1.exec)(command, (error, stdout) => {
+        (0, node_child_process_1.exec)(command, { maxBuffer: MAX_BUFFER }, (error, stdout) => {
             if (error) {
                 core.error(`could not execute command: ${command}. error: ${error.message}`);
                 return resolve({
@@ -1501,7 +1502,7 @@ const execCommand = async (command) => {
 exports.execCommand = execCommand;
 const execFileCommand = async (file, args) => {
     return new Promise((resolve) => {
-        (0, node_child_process_1.execFile)(file, args, (error, stdout) => {
+        (0, node_child_process_1.execFile)(file, args, { maxBuffer: MAX_BUFFER }, (error, stdout) => {
             if (error) {
                 core.error(`could not execute command: ${file} ${args.join(' ')}. error: ${error.message}`);
                 return resolve({
