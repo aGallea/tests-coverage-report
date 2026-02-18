@@ -40,3 +40,24 @@ describe('execFileCommand tests', () => {
     expect(result.stdout?.trim()).toEqual('$(whoami)');
   });
 });
+
+describe('maxBuffer handling', () => {
+  test('execCommand handles output larger than default 1MB limit', async () => {
+    // Generate ~2MB of output (exceeds Node.js default 1MB maxBuffer)
+    const result = await execCommand('python3 -c "print(\'x\' * (2 * 1024 * 1024))"');
+    expect(result.status).toEqual('success');
+    expect(result.stdout).toBeDefined();
+    expect(result.stdout!.length).toBeGreaterThan(2 * 1024 * 1024);
+  });
+
+  test('execFileCommand handles output larger than default 1MB limit', async () => {
+    // Generate ~2MB of output (exceeds Node.js default 1MB maxBuffer)
+    const result = await execFileCommand('python3', [
+      '-c',
+      "print('x' * (2 * 1024 * 1024))",
+    ]);
+    expect(result.status).toEqual('success');
+    expect(result.stdout).toBeDefined();
+    expect(result.stdout!.length).toBeGreaterThan(2 * 1024 * 1024);
+  });
+});

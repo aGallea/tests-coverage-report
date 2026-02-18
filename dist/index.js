@@ -21,24 +21,25 @@ const getChangedFiles = async (eventInfo) => {
         unchanged: [],
     };
     const octokit = (0, github_1.getOctokit)(eventInfo.token);
-    let pages = 1;
-    const pagedFiles = [];
-    for (let currPage = 1; currPage <= pages; currPage++) {
-        const { data: { total_commits, files }, } = await octokit.rest.repos.compareCommitsWithBasehead({
+    const perPage = 50;
+    let currPage = 1;
+    let hasMorePages = true;
+    while (hasMorePages) {
+        const { data: { files }, } = await octokit.rest.repos.compareCommitsWithBasehead({
             owner: eventInfo.owner,
             repo: eventInfo.repo,
             basehead: `${eventInfo.baseRef}...${eventInfo.headRef}`,
-            per_page: 50,
+            per_page: perPage,
             page: currPage,
         });
         if (files) {
-            pages = Math.ceil(total_commits / 50);
             for (const file of files) {
                 allFiles.all.push(file.filename);
                 allFiles[`${file.status}`].push(file.filename);
             }
-            pagedFiles.push(...files);
         }
+        hasMorePages = (files?.length ?? 0) >= perPage;
+        currPage++;
     }
     return allFiles;
 };
@@ -383,6 +384,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getEventInfo = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
+const VALID_DIFFCOVER_REFS = ['cobertura', 'clover', 'lcov', 'jacoco'];
+const parseDiffcoverRef = (input) => {
+    if (VALID_DIFFCOVER_REFS.includes(input)) {
+        return input;
+    }
+    if (input) {
+        core.warning(`Invalid diffcover-ref: '${input}'. Defaulting to 'cobertura'.`);
+    }
+    return 'cobertura';
+};
 const getEventInfo = () => {
     const eventInfo = {
         token: core.getInput('github-token', { required: true }),
@@ -403,7 +414,7 @@ const getEventInfo = () => {
         showFailuresInfo: core.getBooleanInput('show-failures-info', { required: false }),
         overrideComment: core.getBooleanInput('override-comment', { required: false }),
         commentId: '<!-- tests-coverage-report -->',
-        diffcoverRef: core.getInput('diffcover-ref', { required: false }),
+        diffcoverRef: parseDiffcoverRef(core.getInput('diffcover-ref', { required: false })),
         commitSha: '',
         headRef: '',
         baseRef: '',
@@ -461,7 +472,7 @@ const main_1 = __nccwpck_require__(3119);
     core.info('success');
 })
     .catch((err) => {
-    core.error(`exception. ${err.message}`);
+    core.setFailed(`exception. ${err.message}`);
 });
 //# sourceMappingURL=index.js.map
 
@@ -608,12 +619,12 @@ const classDetailsFromProjects = (projects) => {
                 else {
                     packageName = null;
                 }
-                data.file.forEach(parseFileObject);
+                data.file.forEach((file) => parseFileObject(file, packageName));
             });
         }
         if (projectObj.file) {
             packageName = null;
-            projectObj.file.forEach(parseFileObject);
+            projectObj.file.forEach((file) => parseFileObject(file, packageName));
         }
     });
     return classDetails;

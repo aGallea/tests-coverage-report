@@ -4,9 +4,10 @@ import * as github from '@actions/github';
 export const defaultInputs: { [key: string]: any } = {
   title: 'Tests Report Mock',
   'github-token': 'abcdefgh',
-  'cobertura-path': 'cobertura.xml',
+  'cobertura-path': '',
   'show-junit': false,
   'min-coverage-percentage': '80',
+  'diffcover-ref': 'cobertura',
 };
 
 export const defaultCompareCommitsWithBasehead: { [key: string]: any } = {
@@ -32,7 +33,7 @@ export function spyActions(data = defaultData, eventName = 'pull_request') {
   jest.spyOn(core, 'warning').mockImplementation(jest.fn());
   jest.spyOn(core, 'info').mockImplementation(jest.fn());
   jest.spyOn(core, 'debug').mockImplementation(jest.fn());
-  // jest.spyOn(core, 'setFailed').mockImplementation(jest.fn());
+  jest.spyOn(core, 'setFailed').mockImplementation(jest.fn());
 
   jest.spyOn(github.context, 'repo', 'get').mockImplementation(() => {
     return {
