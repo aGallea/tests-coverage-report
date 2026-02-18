@@ -5,9 +5,9 @@ import * as core from '@actions/core';
 
 const classDetailsFromProjects = (projects: any) => {
   let classDetails: any[] = [];
-  let packageName = null;
+  let packageName: string | null = null;
 
-  const parseFileObject = (fileObj: any, packageName: string) => {
+  const parseFileObject = (fileObj: any, packageName: string | null) => {
     if (fileObj.class) {
       fileObj['class'].forEach((classObj: any) => {
         classDetails = classDetails.concat({
@@ -39,12 +39,12 @@ const classDetailsFromProjects = (projects: any) => {
         } else {
           packageName = null;
         }
-        data.file.forEach(parseFileObject);
+        data.file.forEach((file: any) => parseFileObject(file, packageName));
       });
     }
     if (projectObj.file) {
       packageName = null;
-      projectObj.file.forEach(parseFileObject);
+      projectObj.file.forEach((file: any) => parseFileObject(file, packageName));
     }
   });
   return classDetails;
