@@ -90,4 +90,14 @@ describe('eventInput tests', () => {
     const eventInfo: EventInfo = getEventInfo();
     expect(eventInfo.diffcoverRef).toBe('cobertura');
   });
+
+  test('getEventInfo - boolean inputs have correct types', () => {
+    spyActions();
+    const eventInfo: EventInfo = getEventInfo();
+    expect(typeof eventInfo.showJunit).toBe('boolean');
+    expect(typeof eventInfo.showDiffcover).toBe('boolean');
+    expect(typeof eventInfo.failUnderCoveragePercentage).toBe('boolean');
+    expect(typeof eventInfo.showFailuresInfo).toBe('boolean');
+    expect(typeof eventInfo.overrideComment).toBe('boolean');
+  });
 });
