@@ -2,6 +2,20 @@ import * as core from '@actions/core';
 import { DiffCoverRef, EventInfo } from './types';
 import { context } from '@actions/github';
 
+const VALID_DIFFCOVER_REFS: DiffCoverRef[] = ['cobertura', 'clover', 'lcov', 'jacoco'];
+
+const parseDiffcoverRef = (input: string): DiffCoverRef => {
+  if (VALID_DIFFCOVER_REFS.includes(input as DiffCoverRef)) {
+    return input as DiffCoverRef;
+  }
+  if (input && input !== '') {
+    core.warning(
+      `Invalid diffcover-ref value: '${input}'. Valid values: ${VALID_DIFFCOVER_REFS.join(', ')}. Defaulting to 'cobertura'.`,
+    );
+  }
+  return 'cobertura';
+};
+
 export const getEventInfo = (): EventInfo => {
   const eventInfo: EventInfo = {
     token: core.getInput('github-token', { required: true }),
@@ -22,7 +36,7 @@ export const getEventInfo = (): EventInfo => {
     showFailuresInfo: core.getBooleanInput('show-failures-info', { required: false }),
     overrideComment: core.getBooleanInput('override-comment', { required: false }),
     commentId: '<!-- tests-coverage-report -->',
-    diffcoverRef: core.getInput('diffcover-ref', { required: false }) as DiffCoverRef,
+    diffcoverRef: parseDiffcoverRef(core.getInput('diffcover-ref', { required: false })),
     commitSha: '',
     headRef: '',
     baseRef: '',

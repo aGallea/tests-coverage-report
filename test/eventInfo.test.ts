@@ -51,4 +51,43 @@ describe('eventInput tests', () => {
     expect(eventInfo.coberturaPath).toBeUndefined();
     expect(eventInfo.showJunit).toBeTruthy();
   });
+
+  test('getEventInfo - invalid diffcoverRef defaults to cobertura', () => {
+    const data = {
+      inputs: {
+        'github-token': 'abcdefgh',
+        'diffcover-ref': 'invalid-value',
+      },
+      compareCommitsWithBasehead: defaultCompareCommitsWithBasehead,
+    };
+    spyActions(data);
+    const eventInfo: EventInfo = getEventInfo();
+    expect(eventInfo.diffcoverRef).toBe('cobertura');
+  });
+
+  test('getEventInfo - valid diffcoverRef is preserved', () => {
+    const data = {
+      inputs: {
+        'github-token': 'abcdefgh',
+        'diffcover-ref': 'lcov',
+      },
+      compareCommitsWithBasehead: defaultCompareCommitsWithBasehead,
+    };
+    spyActions(data);
+    const eventInfo: EventInfo = getEventInfo();
+    expect(eventInfo.diffcoverRef).toBe('lcov');
+  });
+
+  test('getEventInfo - empty diffcoverRef defaults to cobertura', () => {
+    const data = {
+      inputs: {
+        'github-token': 'abcdefgh',
+        'diffcover-ref': '',
+      },
+      compareCommitsWithBasehead: defaultCompareCommitsWithBasehead,
+    };
+    spyActions(data);
+    const eventInfo: EventInfo = getEventInfo();
+    expect(eventInfo.diffcoverRef).toBe('cobertura');
+  });
 });
