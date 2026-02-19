@@ -128,12 +128,12 @@
 
 ## P3 — Low Priority (Cleanup)
 
-### [ ] P3-1: Consider migrating xml2js to fast-xml-parser
+### [x] P3-1: Consider migrating xml2js to fast-xml-parser
 
-- **Files**: All parsers in `src/parsers/`
+- **Files**: All parsers in `src/parsers/`, `src/parsers/xmlUtils.ts`, `package.json`
 - **Issue**: xml2js is effectively unmaintained (last meaningful update 2023, issues piling up). `fast-xml-parser` is actively maintained, faster, and has better TypeScript support.
-- **Fix**: Replace `xml2js.parseString` with `fast-xml-parser` across all XML parsers. Update unpackage functions for new parse tree shape.
-- **Risk**: High — touches all parsers, requires extensive test updates. Should be done as a standalone effort.
+- **Fix**: Replaced `xml2js` with `fast-xml-parser@^5.3.6` across all 4 XML parsers (cobertura, clover, jacoco, junit). Updated `xmlUtils.ts` with `createXmlParser()` factory using per-parser `isArray` paths. Removed all `$` attribute access patterns. Simplified async parsing to sync `parser.parse()`.
+- **Done**: All 12 test suites pass, build clean, package succeeds.
 
 ### [x] P3-2: Deduplicate XML parser boilerplate
 
@@ -193,6 +193,6 @@
 - **P1-1 (npm upgrades) is complete** — merged in PR #67.
 - **P2 is complete** — merged in PR #68. TypeScript 5, test fixes, input validation, coverage improvements.
 - **P3-2 through P3-7 are complete** — parser dedup, typo fixes, dead code removal, tsconfig strict mode, jest config cleanup, pre-commit fixes.
-- **P3-1 (xml2js migration)** deferred — largest effort, to be done as a separate initiative.
+- **P3-1 (xml2js migration) is complete** — migrated all 4 XML parsers from xml2js to fast-xml-parser v5.
 - **Dependency order**: P1-3 should be done before P2-5 (clover bug fix enables test assertions).
 - After any fix, run: `npm run build && npm test && npm run package`
