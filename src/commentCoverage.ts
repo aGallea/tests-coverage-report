@@ -72,7 +72,7 @@ const buildTestsStatusMarkdown = (junitInfo: Junit | undefined) => {
     const markdown =
       junitInfo.failures?.count || junitInfo.errors
         ? '### Tests Failure :x:'
-        : '### Tests Succees :white_check_mark:';
+        : '### Tests Success :white_check_mark:';
     return `${markdown}\n`;
   }
   return '';
@@ -100,7 +100,6 @@ const buildJunitMarkdown = (eventInfo: EventInfo, junitInfo: Junit | undefined) 
       }
       markdown += '</table></details>\n';
     }
-    // markdown += `\nThis is a [hover text](## "your hover text") example.`;
     return '### JUnit Details\n' + markdown + '\n';
   }
   if (eventInfo.showJunit && !junitInfo) {
