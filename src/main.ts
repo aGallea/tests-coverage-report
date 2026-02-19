@@ -35,6 +35,6 @@ export const main = async (): Promise<void> => {
     const diffInfo: DiffInfo[] = await diffCover(eventInfo, changedFile, coverageInfo);
     await commentCoverage(eventInfo, buildBody(eventInfo, coverageInfo.junit, diffInfo));
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error instanceof Error ? error.message : String(error));
   }
 };

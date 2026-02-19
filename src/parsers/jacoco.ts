@@ -1,7 +1,6 @@
-import fs from 'fs';
 import { CoverInfo } from '../types';
 import parseString from 'xml2js';
-import * as core from '@actions/core';
+import { readAndParseXmlFile } from './xmlUtils';
 
 const getCounter = (source: any, type: string) => {
   source.counter = source.counter || [];
@@ -116,31 +115,5 @@ const parseContent = (xml: string): Promise<CoverInfo[]> => {
 };
 
 export const parseFile = async (file: string): Promise<CoverInfo[]> => {
-  return new Promise((resolve, reject) => {
-    if (!file || file === '') {
-      core.info('no jacoco file specified');
-      resolve([]);
-    } else {
-      fs.readFile(
-        file,
-        'utf8',
-        async (err: NodeJS.ErrnoException | null, data: string) => {
-          if (err) {
-            core.error(`failed to read file: ${file}. error: ${err.message}`);
-            reject(err);
-          } else {
-            try {
-              const info = await parseContent(data);
-              // console.log('====== jacoco ======');
-              // console.log(JSON.stringify(info, null, 2));
-              resolve(info);
-            } catch (error) {
-              core.error(`failed to parseContent. err: ${error.message}`);
-              reject(error);
-            }
-          }
-        },
-      );
-    }
-  });
+  return readAndParseXmlFile(file, 'jacoco', parseContent);
 };

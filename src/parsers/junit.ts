@@ -117,11 +117,11 @@ const parseFile = async (file: string): Promise<Junit | undefined> => {
       } else {
         try {
           const info = await parseContent(data);
-          // console.log('====== junit ======');
-          // console.log(JSON.stringify(info, null, 2));
           resolve(info);
         } catch (error) {
-          core.error(`failed to parseContent. err: ${error.message}`);
+          core.error(
+            `failed to parseContent. err: ${error instanceof Error ? error.message : String(error)}`,
+          );
           reject(error);
         }
       }
@@ -148,7 +148,7 @@ const parseFolder = async (folder: string): Promise<Junit | undefined> => {
       }
     } catch (error) {
       core.error(
-        `failed to parse folder file: ${folder}/${file}. error: ${error.message}`,
+        `failed to parse folder file: ${folder}/${file}. error: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -170,7 +170,9 @@ const getTestsuiteList = async (filename: string) => {
     }
     return testsuiteList;
   } catch (error) {
-    core.error(`failed to read file: ${filename}. error: ${error.message}`);
+    core.error(
+      `failed to read file: ${filename}. error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return [];
   }
 };

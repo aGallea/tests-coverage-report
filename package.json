@@ -9,7 +9,7 @@
     "test:smoke": "jest --config jest.integration.config.ts --testPathPattern='smoke' --silent",
     "test:e2e": "jest --config jest.integration.config.ts --testPathPattern='action' --silent",
     "prebuild": "npm run lint",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "prepackage": "npm run build",
     "package": "./node_modules/.bin/ncc build dist/src/index.js --license licenses",
     "postpackage": "npm run precommit:fix:mixed-line-ending ; npm run precommit:fix:end-of-file ; npm run precommit:fix:trailing-whitespace",
@@ -26,7 +26,7 @@
   },
   "keywords": [
     "coverage",
-    "cubertura",
+    "cobertura",
     "junit",
     "jacoco",
     "lcov",

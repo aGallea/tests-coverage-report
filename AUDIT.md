@@ -135,55 +135,53 @@
 - **Fix**: Replace `xml2js.parseString` with `fast-xml-parser` across all XML parsers. Update unpackage functions for new parse tree shape.
 - **Risk**: High — touches all parsers, requires extensive test updates. Should be done as a standalone effort.
 
-### [ ] P3-2: Deduplicate XML parser boilerplate
+### [x] P3-2: Deduplicate XML parser boilerplate
 
-- **Files**: `src/parsers/cobertura.ts`, `junit.ts`, `jacoco.ts`, `clover.ts`
-- **Issue**: All 4 XML parsers duplicate the same pattern: read file → parseString → unpackage → resolve/reject. Only `unpackage()` differs.
-- **Fix**: Extract a shared `parseXmlFile(path, unpackageFn)` utility.
+- **Files**: `src/parsers/cobertura.ts`, `jacoco.ts`, `clover.ts`, `src/parsers/xmlUtils.ts` (new)
+- **Issue**: All 3 XML parsers (cobertura, clover, jacoco) duplicated the same parseFile pattern: check empty → readFile → parseContent → resolve/reject with error logging.
+- **Fix**: Extracted shared `readAndParseXmlFile()` utility into `src/parsers/xmlUtils.ts`. Each parser's `parseFile` is now a one-liner.
 - **Risk**: Low — refactoring only, covered by existing tests.
 
-### [ ] P3-3: Fix typos
+### [x] P3-3: Fix typos
 
 - **Files**:
   - `src/commentCoverage.ts` line 75: `"Succees"` → `"Success"`
   - `package.json` line 26: `"cubertura"` → `"cobertura"` in keywords
+  - `test/commentCoverage.test.ts`: Updated 10 test expectations to match
 - **Fix**: Simple string replacements.
 - **Risk**: None.
 
-### [ ] P3-4: Remove dead code and commented debug logs
+### [x] P3-4: Remove dead code and commented debug logs
 
-- **Files**: Multiple source files (11 instances of commented `console.log`, `core.info`, etc.)
-- **Issue**: Leftover debug statements clutter the codebase.
-- **Fix**: Remove all commented-out logging/debug lines.
+- **Files**: `src/parsers/cobertura.ts`, `clover.ts`, `jacoco.ts`, `junit.ts`, `lcov.ts`, `src/commentCoverage.ts`
+- **Issue**: 10 commented `console.log` lines across 5 parsers, 1 commented hover text example, 1 commented file assignment.
+- **Fix**: Removed all commented-out logging/debug lines.
 - **Risk**: None.
 
-### [ ] P3-5: Clean up tsconfig.json
+### [x] P3-5: Clean up tsconfig.json
 
-- **File**: `tsconfig.json`
-- **Issue**:
-  - Test files are included in compilation (no separate tsconfig for tests)
-  - Partial strict mode — `strict: false` but individual strict flags enabled
-  - `outDir` set but unused (ncc bundles directly)
-- **Fix**: Add `tsconfig.build.json` that excludes tests, or add `exclude: ["test"]`. Consider enabling `strict: true`.
-- **Risk**: Low — may surface new type errors if enabling strict.
+- **Files**: `tsconfig.json`, `tsconfig.build.json` (new), `package.json`
+- **Fix**:
+  - Created `tsconfig.build.json` extending `tsconfig.json` with `exclude: ["test/**/*"]` and `rootDir: "."`.
+  - Enabled `strict: true` in `tsconfig.json` (replacing individual `noImplicitAny` + `strictNullChecks`).
+  - Updated build script to use `tsc -p tsconfig.build.json`.
+  - Fixed 7 strict mode errors: 6 `error` is `unknown` in catch blocks, 1 `ExecFileException` type mismatch.
+- **Risk**: Low — all strict errors were straightforward fixes.
 
-### [ ] P3-6: Clean up jest.config.ts
+### [x] P3-6: Clean up jest.config.ts
 
 - **File**: `jest.config.ts`
-- **Issue**: File is mostly commented-out boilerplate. Missing `collectCoverageFrom` (coverage collected but not scoped).
-- **Fix**: Remove boilerplate comments, add `collectCoverageFrom: ['src/**/*.ts']`.
+- **Fix**: Removed ~160 lines of commented-out boilerplate (from jest init template), added `collectCoverageFrom: ['src/**/*.ts']`. File reduced from 210 lines to 24 lines.
 - **Risk**: None.
 
-### [ ] P3-7: Fix pre-commit config issues
+### [x] P3-7: Fix pre-commit config issues
 
 - **File**: `.pre-commit-config.yaml`
-- **Issues**:
-  - ESLint mirror plugin versions don't match installed versions (pre-commit may use different lint rules than local dev).
-  - `check-jsonschema` Renovate hook uses `--disable-format` (should be `--disable-formats`), causing validation to fail.
-  - `default_stages` uses deprecated stage name `commit` (should be `pre-commit`). Run `pre-commit migrate-config` to auto-fix.
-  - ESLint hook catches `.releaserc.js` (CJS file using `module`) but env not configured for CommonJS globals.
-  - `jest.integration.config.ts` not covered by ESLint config — triggers "no matching configuration" warning.
-- **Fix**: Update ESLint plugin versions, fix `--disable-formats` typo, migrate config, add `.releaserc.js` to ESLint excludes or add CJS env, extend ESLint config to cover integration config.
+- **Fix**:
+  - Changed `default_stages: [commit]` → `[pre-commit]` (deprecated stage name).
+  - Updated ESLint mirror `additional_dependencies` from outdated v4/v5 packages to match installed versions: `typescript-eslint@8.56.0`, `eslint-plugin-prettier@5.5.5`, `eslint-config-prettier@10.1.8`, `globals@16.5.0`, `typescript@5.8.3`.
+  - `--disable-formats` typo was already correct in the file.
+  - `.releaserc.js` and `jest.integration.config.ts` were already in ESLint ignores.
 - **Risk**: Low.
 
 ---
@@ -191,10 +189,10 @@
 ## Implementation Notes
 
 - **P0 is complete** — merged in PR #63. Includes node20 upgrade, shell injection fix, smoke tests, and act-js E2E scaffold.
-- **P1-2 through P1-5 are complete** — on branch `fix/p1-bugfixes`. P1-1 (npm upgrades) deferred as highest-risk item.
-- **Pre-existing test failure**: `test/main.test.ts` has 2 failing tests on master (not caused by P1 changes). The "empty content" and "exception" tests mock incorrectly — `main()` reads cobertura.xml before reaching the mocked code path.
+- **P1-2 through P1-5 are complete** — merged in PR #65.
+- **P1-1 (npm upgrades) is complete** — merged in PR #67.
+- **P2 is complete** — merged in PR #68. TypeScript 5, test fixes, input validation, coverage improvements.
+- **P3-2 through P3-7 are complete** — parser dedup, typo fixes, dead code removal, tsconfig strict mode, jest config cleanup, pre-commit fixes.
+- **P3-1 (xml2js migration)** deferred — largest effort, to be done as a separate initiative.
 - **Dependency order**: P1-3 should be done before P2-5 (clover bug fix enables test assertions).
-- **P1 items are independent** — can be done in parallel (except P1-1 npm upgrades which may affect others).
-- **P1-1 (npm upgrades)** is the riskiest — `@actions/github` major bump may require API call changes in `changedFiles.ts` and `commentCoverage.ts`.
-- **P3-1 (xml2js migration)** is the largest effort — save for last or do as a separate initiative.
 - After any fix, run: `npm run build && npm test && npm run package`

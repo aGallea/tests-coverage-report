@@ -1,4 +1,4 @@
-import { exec, execFile, ExecException } from 'node:child_process';
+import { exec, execFile, ExecException, ExecFileException } from 'node:child_process';
 import * as core from '@actions/core';
 
 const MAX_BUFFER = 10 * 1024 * 1024;
@@ -42,7 +42,7 @@ export const execFileCommand = async (
       file,
       args,
       { maxBuffer: MAX_BUFFER },
-      (error: ExecException | null, stdout: string) => {
+      (error: ExecFileException | null, stdout: string) => {
         if (error) {
           core.error(
             `could not execute command: ${file} ${args.join(' ')}. error: ${error.message}`,

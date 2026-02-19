@@ -162,7 +162,7 @@ describe('commentCoverage tests', () => {
 
     test('dont show junit and diffCover content', async () => {
       expect(buildBody(eventInfo, junitInfo, [])).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n',
       );
     });
     test('show only junit content, without junit info', async () => {
@@ -174,7 +174,7 @@ describe('commentCoverage tests', () => {
     test('show only junit content', async () => {
       eventInfo.showJunit = true;
       expect(buildBody(eventInfo, junitInfo, [])).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### JUnit Details\n| Total Tests | Failures  | Errors  | Skipped  | Time :hourglass_flowing_sand: |\n| ------------------ | --------------------- | ------------------- | -------------------- | ----------------- |\n| 51 | 0 | 0 | 0 | 12s |\n\n',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### JUnit Details\n| Total Tests | Failures  | Errors  | Skipped  | Time :hourglass_flowing_sand: |\n| ------------------ | --------------------- | ------------------- | -------------------- | ----------------- |\n| 51 | 0 | 0 | 0 | 12s |\n\n',
       );
     });
     test('show junit content, with failures info', async () => {
@@ -198,13 +198,13 @@ describe('commentCoverage tests', () => {
     test('show only diffCover content, without diff info', async () => {
       eventInfo.showDiffcover = true;
       expect(buildBody(eventInfo, junitInfo, [])).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details :ballot_box_with_check:\nNo coverage details to present',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### Coverage Details :ballot_box_with_check:\nNo coverage details to present',
       );
     });
     test('show only diffCover content', async () => {
       eventInfo.showDiffcover = true;
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (67% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td>Total</td><td>4/6</td><td>67%</td><td></td></tr></table></details>',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### Coverage Details (67% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td>Total</td><td>4/6</td><td>67%</td><td></td></tr></table></details>',
       );
     });
     test('diffCover content with full coverage', async () => {
@@ -216,7 +216,7 @@ describe('commentCoverage tests', () => {
         missedLines: [],
       });
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (100% >= 80%) :white_check_mark:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>6/6</td><td>100%</td><td></td></tr><tr><td>Total</td><td>6/6</td><td>100%</td><td></td></tr></table></details>',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### Coverage Details (100% >= 80%) :white_check_mark:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>6/6</td><td>100%</td><td></td></tr><tr><td>Total</td><td>6/6</td><td>100%</td><td></td></tr></table></details>',
       );
     });
     test('diffCover content with no changes', async () => {
@@ -228,7 +228,7 @@ describe('commentCoverage tests', () => {
         missedLines: [],
       });
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n',
       );
     });
     test('diffCover content with missed range', async () => {
@@ -239,7 +239,7 @@ describe('commentCoverage tests', () => {
         missedLines: ['1', '2', '3', '5'],
       });
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
       );
     });
     test('diffCover content with full coverage', async () => {
@@ -252,7 +252,7 @@ describe('commentCoverage tests', () => {
         missedLines: [],
       });
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (100% >= 100%) :white_check_mark:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>6/6</td><td>100%</td><td></td></tr><tr><td>Total</td><td>6/6</td><td>100%</td><td></td></tr></table></details>',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### Coverage Details (100% >= 100%) :white_check_mark:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>6/6</td><td>100%</td><td></td></tr><tr><td>Total</td><td>6/6</td><td>100%</td><td></td></tr></table></details>',
       );
     });
     test('diffCover content with missed range and failUnder', async () => {
@@ -265,12 +265,12 @@ describe('commentCoverage tests', () => {
       });
       const coreSetFailedSpy = jest.spyOn(core, 'setFailed');
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
       );
       expect(coreSetFailedSpy).not.toHaveBeenCalled();
       eventInfo.failUnderCoveragePercentage = true;
       expect(buildBody(eventInfo, junitInfo, diffsInfo)).toEqual(
-        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Succees :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
+        '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n### Tests Success :white_check_mark:\n### Coverage Details (50% < 80%) :x:\n\n<details><table><summary><b>Diff Cover Details</b>\n\n</summary><tr><th>File</th><th colspan="2">Covered Lines</th><th>Missing Lines</th></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file">1.file</a></td><td>4/6</td><td>67%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L2">2</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/1.file#L5">5</a></td></tr><tr><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file">2.file</a></td><td>2/6</td><td>33%</td><td><a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L1-L3">1-3</a>,<a href="https://github.com/some-owner/some-repo/blob/abcdefghijklmnopqrstuvwxyz/2.file#L5">5</a></td></tr><tr><td>Total</td><td>6/12</td><td>50%</td><td></td></tr></table></details>',
       );
       expect(coreSetFailedSpy).toHaveBeenCalledWith('low coverage');
     });

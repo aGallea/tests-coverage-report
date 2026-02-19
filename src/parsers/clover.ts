@@ -1,7 +1,6 @@
-import fs from 'fs';
 import { CoverInfo, CoverInfoFunctionsDetails, CoverInfoLinesDetails } from '../types';
 import parseString from 'xml2js';
-import * as core from '@actions/core';
+import { readAndParseXmlFile } from './xmlUtils';
 
 const classDetailsFromProjects = (projects: any) => {
   let classDetails: any[] = [];
@@ -122,31 +121,5 @@ const parseContent = (xml: any): Promise<CoverInfo[]> => {
 };
 
 export const parseFile = async (file: string): Promise<CoverInfo[]> => {
-  return new Promise((resolve, reject) => {
-    if (!file || file === '') {
-      core.info('no clover file specified');
-      resolve([]);
-    } else {
-      fs.readFile(
-        file,
-        'utf8',
-        async (err: NodeJS.ErrnoException | null, data: string) => {
-          if (err) {
-            core.error(`failed to read file: ${file}. error: ${err.message}`);
-            reject(err);
-          } else {
-            try {
-              const info = await parseContent(data);
-              // console.log('====== clover ======');
-              // console.log(JSON.stringify(info, null, 2));
-              resolve(info);
-            } catch (error) {
-              core.error(`failed to parseContent. err: ${error.message}`);
-              reject(error);
-            }
-          }
-        },
-      );
-    }
-  });
+  return readAndParseXmlFile(file, 'clover', parseContent);
 };

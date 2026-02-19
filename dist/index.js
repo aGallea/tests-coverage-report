@@ -153,7 +153,7 @@ const buildTestsStatusMarkdown = (junitInfo) => {
     if (junitInfo) {
         const markdown = junitInfo.failures?.count || junitInfo.errors
             ? '### Tests Failure :x:'
-            : '### Tests Succees :white_check_mark:';
+            : '### Tests Success :white_check_mark:';
         return `${markdown}\n`;
     }
     return '';
@@ -173,7 +173,6 @@ const buildJunitMarkdown = (eventInfo, junitInfo) => {
             }
             markdown += '</table></details>\n';
         }
-        // markdown += `\nThis is a [hover text](## "your hover text") example.`;
         return '### JUnit Details\n' + markdown + '\n';
     }
     if (eventInfo.showJunit && !junitInfo) {
@@ -592,7 +591,7 @@ const main = async () => {
         await (0, commentCoverage_1.commentCoverage)(eventInfo, (0, commentCoverage_1.buildBody)(eventInfo, coverageInfo.junit, diffInfo));
     }
     catch (error) {
-        core.setFailed(error.message);
+        core.setFailed(error instanceof Error ? error.message : String(error));
     }
 };
 exports.main = main;
@@ -605,47 +604,13 @@ exports.main = main;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseFile = void 0;
-const fs_1 = __importDefault(__nccwpck_require__(9896));
 const xml2js_1 = __importDefault(__nccwpck_require__(758));
-const core = __importStar(__nccwpck_require__(7484));
+const xmlUtils_1 = __nccwpck_require__(9569);
 const classDetailsFromProjects = (projects) => {
     let classDetails = [];
     let packageName = null;
@@ -757,32 +722,7 @@ const parseContent = (xml) => {
     });
 };
 const parseFile = async (file) => {
-    return new Promise((resolve, reject) => {
-        if (!file || file === '') {
-            core.info('no clover file specified');
-            resolve([]);
-        }
-        else {
-            fs_1.default.readFile(file, 'utf8', async (err, data) => {
-                if (err) {
-                    core.error(`failed to read file: ${file}. error: ${err.message}`);
-                    reject(err);
-                }
-                else {
-                    try {
-                        const info = await parseContent(data);
-                        // console.log('====== clover ======');
-                        // console.log(JSON.stringify(info, null, 2));
-                        resolve(info);
-                    }
-                    catch (error) {
-                        core.error(`failed to parseContent. err: ${error.message}`);
-                        reject(error);
-                    }
-                }
-            });
-        }
-    });
+    return (0, xmlUtils_1.readAndParseXmlFile)(file, 'clover', parseContent);
 };
 exports.parseFile = parseFile;
 //# sourceMappingURL=clover.js.map
@@ -794,48 +734,14 @@ exports.parseFile = parseFile;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseFile = void 0;
-const fs_1 = __importDefault(__nccwpck_require__(9896));
 const path_1 = __importDefault(__nccwpck_require__(6928));
 const xml2js_1 = __importDefault(__nccwpck_require__(758));
-const core = __importStar(__nccwpck_require__(7484));
+const xmlUtils_1 = __nccwpck_require__(9569);
 const classesFromPackages = (packages) => {
     const classes = [];
     packages.forEach((packages) => {
@@ -887,7 +793,6 @@ const unpackage = (coverage, pwd) => {
         const branches = extractLcovStyleBranches(c);
         const classCov = {
             title: c.$.name,
-            // file: c.$.filename,
             file: path_1.default.join(source, c.$.filename).replace(pwd, ''),
             functions: {
                 found: c.methods && c.methods[0].method ? c.methods[0].method.length : 0,
@@ -946,32 +851,7 @@ const parseContent = (xml, pwd) => {
     });
 };
 const parseFile = async (file, pwd) => {
-    return new Promise((resolve, reject) => {
-        if (!file || file === '') {
-            core.info('no cobertura file specified');
-            resolve([]);
-        }
-        else {
-            fs_1.default.readFile(file, 'utf8', async (err, data) => {
-                if (err) {
-                    core.error(`failed to read file: ${file}. error: ${err.message}`);
-                    reject(err);
-                }
-                else {
-                    try {
-                        const info = await parseContent(data, pwd);
-                        // console.log('====== cobertura ======');
-                        // console.log(JSON.stringify(info, null, 2));
-                        resolve(info);
-                    }
-                    catch (error) {
-                        core.error(`failed to parseContent. err: ${error.message}`);
-                        reject(error);
-                    }
-                }
-            });
-        }
-    });
+    return (0, xmlUtils_1.readAndParseXmlFile)(file, 'cobertura', (data) => parseContent(data, pwd));
 };
 exports.parseFile = parseFile;
 //# sourceMappingURL=cobertura.js.map
@@ -983,47 +863,13 @@ exports.parseFile = parseFile;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseFile = void 0;
-const fs_1 = __importDefault(__nccwpck_require__(9896));
 const xml2js_1 = __importDefault(__nccwpck_require__(758));
-const core = __importStar(__nccwpck_require__(7484));
+const xmlUtils_1 = __nccwpck_require__(9569);
 const getCounter = (source, type) => {
     source.counter = source.counter || [];
     return (source.counter.filter((counter) => {
@@ -1121,32 +967,7 @@ const parseContent = (xml) => {
     });
 };
 const parseFile = async (file) => {
-    return new Promise((resolve, reject) => {
-        if (!file || file === '') {
-            core.info('no jacoco file specified');
-            resolve([]);
-        }
-        else {
-            fs_1.default.readFile(file, 'utf8', async (err, data) => {
-                if (err) {
-                    core.error(`failed to read file: ${file}. error: ${err.message}`);
-                    reject(err);
-                }
-                else {
-                    try {
-                        const info = await parseContent(data);
-                        // console.log('====== jacoco ======');
-                        // console.log(JSON.stringify(info, null, 2));
-                        resolve(info);
-                    }
-                    catch (error) {
-                        core.error(`failed to parseContent. err: ${error.message}`);
-                        reject(error);
-                    }
-                }
-            });
-        }
-    });
+    return (0, xmlUtils_1.readAndParseXmlFile)(file, 'jacoco', parseContent);
 };
 exports.parseFile = parseFile;
 //# sourceMappingURL=jacoco.js.map
@@ -1297,12 +1118,10 @@ const parseFile = async (file) => {
             else {
                 try {
                     const info = await parseContent(data);
-                    // console.log('====== junit ======');
-                    // console.log(JSON.stringify(info, null, 2));
                     resolve(info);
                 }
                 catch (error) {
-                    core.error(`failed to parseContent. err: ${error.message}`);
+                    core.error(`failed to parseContent. err: ${error instanceof Error ? error.message : String(error)}`);
                     reject(error);
                 }
             }
@@ -1329,7 +1148,7 @@ const parseFolder = async (folder) => {
             }
         }
         catch (error) {
-            core.error(`failed to parse folder file: ${folder}/${file}. error: ${error.message}`);
+            core.error(`failed to parse folder file: ${folder}/${file}. error: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     mergedTestSuites.$ = buildMainContent(mergedTestSuites.testsuite);
@@ -1351,7 +1170,7 @@ const getTestsuiteList = async (filename) => {
         return testsuiteList;
     }
     catch (error) {
-        core.error(`failed to read file: ${filename}. error: ${error.message}`);
+        core.error(`failed to read file: ${filename}. error: ${error instanceof Error ? error.message : String(error)}`);
         return [];
     }
 };
@@ -1544,12 +1363,10 @@ function parseFile(file) {
                 else {
                     try {
                         const info = parseContent(data);
-                        // console.log('====== lcov ======');
-                        // console.log(JSON.stringify(info, null, 2));
                         resolve(info);
                     }
                     catch (error) {
-                        core.error(`failed to parseContent. err: ${error.message}`);
+                        core.error(`failed to parseContent. err: ${error instanceof Error ? error.message : String(error)}`);
                         reject(error);
                     }
                 }
@@ -1558,6 +1375,82 @@ function parseFile(file) {
     });
 }
 //# sourceMappingURL=lcov.js.map
+
+/***/ }),
+
+/***/ 9569:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.readAndParseXmlFile = void 0;
+const fs_1 = __importDefault(__nccwpck_require__(9896));
+const core = __importStar(__nccwpck_require__(7484));
+const readAndParseXmlFile = (file, parserName, parseContentFn) => {
+    return new Promise((resolve, reject) => {
+        if (!file || file === '') {
+            core.info(`no ${parserName} file specified`);
+            resolve([]);
+        }
+        else {
+            fs_1.default.readFile(file, 'utf8', async (err, data) => {
+                if (err) {
+                    core.error(`failed to read file: ${file}. error: ${err.message}`);
+                    reject(err);
+                }
+                else {
+                    try {
+                        const info = await parseContentFn(data);
+                        resolve(info);
+                    }
+                    catch (error) {
+                        core.error(`failed to parseContent. err: ${error instanceof Error ? error.message : String(error)}`);
+                        reject(error);
+                    }
+                }
+            });
+        }
+    });
+};
+exports.readAndParseXmlFile = readAndParseXmlFile;
+//# sourceMappingURL=xmlUtils.js.map
 
 /***/ }),
 

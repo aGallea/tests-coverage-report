@@ -1,8 +1,7 @@
-import fs from 'fs';
 import path from 'path';
 import { CoverInfo, CoverInfoBranchesDetails } from '../types';
 import parseString from 'xml2js';
-import * as core from '@actions/core';
+import { readAndParseXmlFile } from './xmlUtils';
 
 const classesFromPackages = (packages: any) => {
   const classes: any[] = [];
@@ -64,7 +63,6 @@ const unpackage = (coverage: any, pwd: string): CoverInfo[] => {
     const branches = extractLcovStyleBranches(c);
     const classCov: CoverInfo = {
       title: c.$.name,
-      // file: c.$.filename,
       file: path.join(source, c.$.filename).replace(pwd, ''),
       functions: {
         found: c.methods && c.methods[0].method ? c.methods[0].method.length : 0,
@@ -130,31 +128,5 @@ const parseContent = (xml: string, pwd: string): Promise<CoverInfo[]> => {
 };
 
 export const parseFile = async (file: string, pwd: string): Promise<CoverInfo[]> => {
-  return new Promise((resolve, reject) => {
-    if (!file || file === '') {
-      core.info('no cobertura file specified');
-      resolve([]);
-    } else {
-      fs.readFile(
-        file,
-        'utf8',
-        async (err: NodeJS.ErrnoException | null, data: string) => {
-          if (err) {
-            core.error(`failed to read file: ${file}. error: ${err.message}`);
-            reject(err);
-          } else {
-            try {
-              const info = await parseContent(data, pwd);
-              // console.log('====== cobertura ======');
-              // console.log(JSON.stringify(info, null, 2));
-              resolve(info);
-            } catch (error) {
-              core.error(`failed to parseContent. err: ${error.message}`);
-              reject(error);
-            }
-          }
-        },
-      );
-    }
-  });
+  return readAndParseXmlFile(file, 'cobertura', (data) => parseContent(data, pwd));
 };
