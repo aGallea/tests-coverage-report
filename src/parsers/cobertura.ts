@@ -1,29 +1,35 @@
 import path from 'path';
 import { CoverInfo, CoverInfoBranchesDetails } from '../types';
-import parseString from 'xml2js';
-import { readAndParseXmlFile } from './xmlUtils';
+import { createXmlParser, readAndParseXmlFile } from './xmlUtils';
 
-const classesFromPackages = (packages: any) => {
+const COBERTURA_ARRAY_PATHS = [
+  'coverage.packages.package',
+  'package.classes.class',
+  'class.methods.method',
+  'class.lines.line',
+  'method.lines.line',
+  'coverage.sources.source',
+];
+
+const parser = createXmlParser(COBERTURA_ARRAY_PATHS);
+
+const classesFromPackages = (packages: any[]) => {
   const classes: any[] = [];
-
-  packages.forEach((packages: any) => {
-    packages.package.forEach((pack: any) => {
-      pack.classes.forEach((c: any) => {
-        classes.push(...c.class);
-      });
+  packages.forEach((pack: any) => {
+    pack.classes.class.forEach((c: any) => {
+      classes.push(c);
     });
   });
-
   return classes;
 };
 
 const extractLcovStyleBranches = (c: any) => {
   const branches: CoverInfoBranchesDetails[] = [];
 
-  if (c.lines && c.lines[0].line) {
-    c.lines[0].line.forEach((l: any) => {
-      if (l.$.branch == 'true') {
-        const branchFraction = l.$['condition-coverage'].split(' ');
+  if (c.lines && c.lines.line) {
+    c.lines.line.forEach((l: any) => {
+      if (l.branch === true || l.branch === 'true') {
+        const branchFraction = l['condition-coverage'].split(' ');
         const branchStats = branchFraction[1].match(/\d+/g);
         const coveredBranches = Number(branchStats[0]);
         const totalBranches = Number(branchStats[1]);
@@ -32,7 +38,7 @@ const extractLcovStyleBranches = (c: any) => {
 
         for (let i = 0; i < leftBranches; i++) {
           branches.push({
-            line: Number(l.$.number),
+            line: Number(l.number),
             branch: branchNumber,
             taken: 0,
           });
@@ -41,7 +47,7 @@ const extractLcovStyleBranches = (c: any) => {
 
         for (let i = 0; i < coveredBranches; i++) {
           branches.push({
-            line: Number(l.$.number),
+            line: Number(l.number),
             branch: branchNumber,
             taken: 1,
           });
@@ -55,39 +61,39 @@ const extractLcovStyleBranches = (c: any) => {
 };
 
 const unpackage = (coverage: any, pwd: string): CoverInfo[] => {
-  const packages = coverage.packages;
-  const source = coverage.sources[0].source[0];
+  const packages = coverage.packages.package;
+  const source = coverage.sources.source[0];
 
   const classes = classesFromPackages(packages);
   return classes.map((c) => {
     const branches = extractLcovStyleBranches(c);
     const classCov: CoverInfo = {
-      title: c.$.name,
-      file: path.join(source, c.$.filename).replace(pwd, ''),
+      title: c.name,
+      file: path.join(source, c.filename).replace(pwd, ''),
       functions: {
-        found: c.methods && c.methods[0].method ? c.methods[0].method.length : 0,
+        found: c.methods && c.methods.method ? c.methods.method.length : 0,
         hit: 0,
         details:
-          !c.methods || !c.methods[0].method
+          !c.methods || !c.methods.method
             ? []
-            : c.methods[0].method.map((m: any) => {
+            : c.methods.method.map((m: any) => {
                 return {
-                  name: m.$.name,
-                  line: Number(m.lines[0].line[0].$.number),
-                  hit: Number(m.lines[0].line[0].$.hits),
+                  name: m.name,
+                  line: Number(m.lines.line[0].number),
+                  hit: Number(m.lines.line[0].hits),
                 };
               }),
       },
       lines: {
-        found: c.lines && c.lines[0].line ? c.lines[0].line.length : 0,
+        found: c.lines && c.lines.line ? c.lines.line.length : 0,
         hit: 0,
         details:
-          !c.lines || !c.lines[0].line
+          !c.lines || !c.lines.line
             ? []
-            : c.lines[0].line.map((l: any) => {
+            : c.lines.line.map((l: any) => {
                 return {
-                  line: Number(l.$.number),
-                  hit: Number(l.$.hits),
+                  line: Number(l.number),
+                  hit: Number(l.hits),
                 };
               }),
       },
@@ -112,19 +118,12 @@ const unpackage = (coverage: any, pwd: string): CoverInfo[] => {
   });
 };
 
-const parseContent = (xml: string, pwd: string): Promise<CoverInfo[]> => {
-  return new Promise((resolve, reject) => {
-    parseString.parseString(xml, (err, parseResult) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!parseResult?.coverage) {
-        return reject(new Error('invalid or missing xml content'));
-      }
-      const result = unpackage(parseResult.coverage, pwd);
-      resolve(result);
-    });
-  });
+const parseContent = (xml: string, pwd: string): CoverInfo[] => {
+  const parseResult = parser.parse(xml);
+  if (!parseResult?.coverage) {
+    throw new Error('invalid or missing xml content');
+  }
+  return unpackage(parseResult.coverage, pwd);
 };
 
 export const parseFile = async (file: string, pwd: string): Promise<CoverInfo[]> => {

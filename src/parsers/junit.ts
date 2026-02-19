@@ -1,7 +1,15 @@
 import fs from 'fs';
 import { Junit, JunitFailureInfo } from '../types';
-import parseString from 'xml2js';
+import { createXmlParser } from './xmlUtils';
 import * as core from '@actions/core';
+
+const JUNIT_ARRAY_PATHS = [
+  'testsuites.testsuite',
+  'testsuite.testcase',
+  'testcase.failure',
+];
+
+const parser = createXmlParser(JUNIT_ARRAY_PATHS);
 
 const safeParseInt = (val: any): number => {
   const parsed = parseInt(val, 10);
@@ -14,44 +22,44 @@ const safeParseFloat = (val: any): number => {
 };
 
 const unpackage = (testsuites: any): Junit => {
-  const main = testsuites['$'] || {};
+  const main = testsuites;
   const testsuite: any[] = testsuites.testsuite;
 
   const errors =
     testsuite
-      ?.map((test: any) => safeParseInt(test['$'].errors))
+      ?.map((test: any) => safeParseInt(test.errors))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const skipped =
     testsuite
-      ?.map((test: any) => safeParseInt(test['$'].skipped))
+      ?.map((test: any) => safeParseInt(test.skipped))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const tests =
     testsuite
-      ?.map((test: any) => safeParseInt(test['$'].tests))
+      ?.map((test: any) => safeParseInt(test.tests))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const failures =
     testsuite
-      ?.map((test: any) => safeParseInt(test['$'].failures))
+      ?.map((test: any) => safeParseInt(test.failures))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
   const time =
     testsuite
-      ?.map((test: any) => safeParseFloat(test['$'].time))
+      ?.map((test: any) => safeParseFloat(test.time))
       .reduce((acc: number, curr: number) => acc + curr, 0) || 0;
 
-  const testSuiteFailures = testsuite?.filter((test: any) => +test['$'].failures > 0);
+  const testSuiteFailures = testsuite?.filter((test: any) => +test.failures > 0);
   const failureCase: JunitFailureInfo[] | undefined = testSuiteFailures
     .map((testSuiteFailure: any) => {
       const testCaseFailures: any[] = testSuiteFailure.testcase.filter(
         (testCase: any) => testCase.failure,
       );
       return testCaseFailures.map((testCaseFailure: any) => ({
-        classname: testCaseFailure['$'].classname.trim(),
-        name: testCaseFailure['$'].name.trim(),
-        time: `${parseFloat(testCaseFailure['$'].time).toFixed(2)}s`,
+        classname: String(testCaseFailure.classname).trim(),
+        name: String(testCaseFailure.name).trim(),
+        time: `${parseFloat(testCaseFailure.time).toFixed(2)}s`,
         error: getTestFailureMessage(testCaseFailure),
       }));
     })
@@ -75,25 +83,10 @@ const getTestFailureMessage = (testCaseFailure: any): string => {
     if (typeof failure === 'string') {
       return failure.split('\n')?.[0]?.trim() || 'unhandled string error';
     } else if (typeof failure === 'object') {
-      return failure['$']?.message || failure.message || 'unhandled object error';
+      return failure.message || 'unhandled object error';
     }
   }
   return 'unknown failure';
-};
-
-const parseContent = (xml: string): Promise<Junit> => {
-  return new Promise((resolve, reject) => {
-    parseString.parseString(xml, (err, parseResult) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!parseResult?.testsuites) {
-        return reject(new Error('invalid or missing xml content'));
-      }
-      const result = unpackage(parseResult.testsuites);
-      resolve(result);
-    });
-  });
 };
 
 export const parse = async (path: string): Promise<Junit | undefined> => {
@@ -110,14 +103,18 @@ export const parse = async (path: string): Promise<Junit | undefined> => {
 
 const parseFile = async (file: string): Promise<Junit | undefined> => {
   return new Promise((resolve, reject) => {
-    fs.readFile(file, 'utf8', async (err: NodeJS.ErrnoException | null, data: string) => {
+    fs.readFile(file, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {
       if (err) {
         core.error(`failed to read file: ${file}. error: ${err.message}`);
         reject(err);
       } else {
         try {
-          const info = await parseContent(data);
-          resolve(info);
+          const parseResult = parser.parse(data);
+          if (!parseResult?.testsuites) {
+            return reject(new Error('invalid or missing xml content'));
+          }
+          const result = unpackage(parseResult.testsuites);
+          resolve(result);
         } catch (error) {
           core.error(
             `failed to parseContent. err: ${error instanceof Error ? error.message : String(error)}`,
@@ -131,7 +128,6 @@ const parseFile = async (file: string): Promise<Junit | undefined> => {
 
 const parseFolder = async (folder: string): Promise<Junit | undefined> => {
   const mergedTestSuites: any = {
-    $: {},
     testsuite: [],
   };
   const files = fs.readdirSync(folder);
@@ -139,7 +135,7 @@ const parseFolder = async (folder: string): Promise<Junit | undefined> => {
     try {
       if (file.endsWith('.xml')) {
         const filePath = `${folder}/${file}`;
-        const testSuiteArray = await getTestsuiteList(filePath);
+        const testSuiteArray = getTestsuiteList(filePath);
         if (testSuiteArray.length === 0) {
           core.warning(`No tests found in file: ${filePath}`);
         } else {
@@ -152,21 +148,21 @@ const parseFolder = async (folder: string): Promise<Junit | undefined> => {
       );
     }
   }
-  mergedTestSuites.$ = buildMainContent(mergedTestSuites.testsuite);
+  Object.assign(mergedTestSuites, buildMainContent(mergedTestSuites.testsuite));
   return unpackage(mergedTestSuites);
 };
 
-const getTestsuiteList = async (filename: string) => {
+const getTestsuiteList = (filename: string) => {
   try {
     const testsuiteList: any[] = [];
     const xmlContent = fs.readFileSync(filename, 'utf8');
-    const parseResult = await parseString.parseStringPromise(xmlContent);
-    if (Object.keys(parseResult)?.[0] === 'testsuite') {
-      testsuiteList.push(parseResult.testsuite);
-    } else if (Object.keys(parseResult)?.[0] === 'testsuites') {
+    const parseResult = parser.parse(xmlContent);
+    if (parseResult.testsuites) {
       for (const testsuite of parseResult.testsuites.testsuite) {
         testsuiteList.push(testsuite);
       }
+    } else if (parseResult.testsuite) {
+      testsuiteList.push(parseResult.testsuite);
     }
     return testsuiteList;
   } catch (error) {
@@ -187,12 +183,12 @@ const buildMainContent = (testSuiteList: any[]) => {
     time: 0,
   };
   for (const testSuite of testSuiteList) {
-    main.tests += +testSuite.$.tests;
-    main.failures += +testSuite.$.failures;
-    main.errors += +testSuite.$.errors;
-    main.skipped += +testSuite.$.skipped;
-    if (main.time < +testSuite.$.time) {
-      main.time = +testSuite.$.time;
+    main.tests += +testSuite.tests;
+    main.failures += +testSuite.failures;
+    main.errors += +testSuite.errors;
+    main.skipped += +testSuite.skipped;
+    if (main.time < +testSuite.time) {
+      main.time = +testSuite.time;
     }
   }
   return {

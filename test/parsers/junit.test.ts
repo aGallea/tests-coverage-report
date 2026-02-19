@@ -15,9 +15,7 @@ describe('junit parser tests', () => {
     );
   });
   test('error xml content', async () => {
-    await expect(parse('./test/assets/invalidXmlContent.xml')).rejects.toThrow(
-      'Non-whitespace before first tag.\nLine: 0\nColumn: 1\nChar: s',
-    );
+    await expect(parse('./test/assets/invalidXmlContent.xml')).rejects.toThrow();
   });
 
   test('Parse', async () => {

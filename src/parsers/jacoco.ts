@@ -1,17 +1,27 @@
 import { CoverInfo } from '../types';
-import parseString from 'xml2js';
-import { readAndParseXmlFile } from './xmlUtils';
+import { createXmlParser, readAndParseXmlFile } from './xmlUtils';
+
+const JACOCO_ARRAY_PATHS = [
+  'report.package',
+  'package.class',
+  'package.sourcefile',
+  'class.method',
+  'sourcefile.counter',
+  'sourcefile.line',
+  'method.counter',
+  'class.counter',
+];
+
+const parser = createXmlParser(JACOCO_ARRAY_PATHS);
 
 const getCounter = (source: any, type: string) => {
   source.counter = source.counter || [];
   return (
     source.counter.filter((counter: any) => {
-      return counter.$.type === type;
+      return counter.type === type;
     })[0] || {
-      $: {
-        covered: 0,
-        missed: 0,
-      },
+      covered: 0,
+      missed: 0,
     }
   );
 };
@@ -23,29 +33,29 @@ const unpackage = (report: any): CoverInfo[] => {
 
   packages.forEach((pack: any) => {
     const cov = pack.sourcefile.map((source: any) => {
-      const fullPath = pack.$.name + '/' + source.$.name;
+      const fullPath = pack.name + '/' + source.name;
 
       const methods = getCounter(source, 'METHOD');
       const lines = getCounter(source, 'LINE');
       const branches = getCounter(source, 'BRANCH');
 
       const classCov: CoverInfo = {
-        title: source.$.name,
+        title: source.name,
         file: fullPath,
         functions: {
-          found: Number(methods.$.covered) + Number(methods.$.missed),
-          hit: Number(methods.$.covered),
+          found: Number(methods.covered) + Number(methods.missed),
+          hit: Number(methods.covered),
           details: pack.class.reduce((result: any, currentClass: any) => {
             return !currentClass.method
               ? result
               : result.concat(
                   currentClass.method.map((method: any) => {
                     const hit = method.counter.some((counter: any) => {
-                      return counter.$.type === 'METHOD' && counter.$.covered === '1';
+                      return counter.type === 'METHOD' && counter.covered === 1;
                     });
                     return {
-                      name: method.$.name,
-                      line: Number(method.$.line),
+                      name: method.name,
+                      line: Number(method.line),
                       hit: hit ? 1 : 0,
                     };
                   }),
@@ -53,35 +63,35 @@ const unpackage = (report: any): CoverInfo[] => {
           }, []),
         },
         lines: {
-          found: Number(lines.$.covered) + Number(lines.$.missed),
-          hit: Number(lines.$.covered),
+          found: Number(lines.covered) + Number(lines.missed),
+          hit: Number(lines.covered),
           details: !source.line
             ? []
             : source.line.map((l: any) => {
                 return {
-                  line: Number(l.$.nr),
-                  hit: Number(l.$.ci),
+                  line: Number(l.nr),
+                  hit: Number(l.ci),
                 };
               }),
         },
         branches: {
-          found: Number(branches.$.covered) + Number(branches.$.missed),
-          hit: Number(branches.$.covered),
+          found: Number(branches.covered) + Number(branches.missed),
+          hit: Number(branches.covered),
           details:
             source.line
               ?.filter((l: any) => {
-                return Number(l.$.mb) > 0 || Number(l.$.cb) > 0;
+                return Number(l.mb) > 0 || Number(l.cb) > 0;
               })
               .map((l: any) => {
                 let branches: any[] = [];
-                const count = Number(l.$.mb) + Number(l.$.cb);
+                const count = Number(l.mb) + Number(l.cb);
 
                 for (let i = 0; i < count; ++i) {
                   branches = branches.concat({
-                    line: Number(l.$.nr),
+                    line: Number(l.nr),
                     block: 0,
                     branch: Number(i),
-                    taken: i < Number(l.$.cb) ? 1 : 0,
+                    taken: i < Number(l.cb) ? 1 : 0,
                   });
                 }
                 return branches;
@@ -99,19 +109,12 @@ const unpackage = (report: any): CoverInfo[] => {
   return output;
 };
 
-const parseContent = (xml: string): Promise<CoverInfo[]> => {
-  return new Promise((resolve, reject) => {
-    parseString.parseString(xml, (err, parseResult) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!parseResult?.report) {
-        return reject(new Error('invalid or missing xml content'));
-      }
-      const result = unpackage(parseResult.report);
-      resolve(result);
-    });
-  });
+const parseContent = (xml: string): CoverInfo[] => {
+  const parseResult = parser.parse(xml);
+  if (!parseResult?.report) {
+    throw new Error('invalid or missing xml content');
+  }
+  return unpackage(parseResult.report);
 };
 
 export const parseFile = async (file: string): Promise<CoverInfo[]> => {
