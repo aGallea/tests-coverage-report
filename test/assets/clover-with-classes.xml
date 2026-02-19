@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1679486438999" clover="3.2.0">
+  <project timestamp="1679486438999" name="All files">
+    <metrics statements="10" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1" elements="12" coveredelements="7" complexity="0" loc="10" ncloc="10" packages="1" files="2" classes="2"/>
+    <package name="com.example">
+      <metrics statements="10" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
+      <file name="Calculator.java" path="/src/com/example/Calculator.java">
+        <metrics statements="6" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
+        <class name="Calculator" metrics-statements="6" metrics-coveredstatements="4"/>
+        <line num="3" count="1" type="method" name="add" signature="(II)I"/>
+        <line num="4" count="5" type="stmt"/>
+        <line num="5" count="5" type="stmt"/>
+        <line num="8" count="0" type="method" name="subtract" signature="(II)I"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+      </file>
+      <file name="Main.java" path="/src/com/example/Main.java">
+        <metrics statements="4" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
