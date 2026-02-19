@@ -123,7 +123,9 @@ export function parseFile(file: string): Promise<CoverInfo[]> {
               const info = parseContent(data);
               resolve(info);
             } catch (error) {
-              core.error(`failed to parseContent. err: ${error.message}`);
+              core.error(
+                `failed to parseContent. err: ${error instanceof Error ? error.message : String(error)}`,
+              );
               reject(error);
             }
           }
