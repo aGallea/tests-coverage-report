@@ -6,6 +6,10 @@ export const defaultInputs: { [key: string]: any } = {
   'github-token': 'abcdefgh',
   'cobertura-path': '',
   'show-junit': false,
+  'show-diffcover': false,
+  'fail-under-coverage-percentage': false,
+  'show-failures-info': false,
+  'override-comment': true,
   'min-coverage-percentage': '80',
   'diffcover-ref': 'cobertura',
 };
