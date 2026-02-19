@@ -131,8 +131,6 @@ export const parseFile = async (file: string): Promise<CoverInfo[]> => {
           } else {
             try {
               const info = await parseContent(data);
-              // console.log('====== jacoco ======');
-              // console.log(JSON.stringify(info, null, 2));
               resolve(info);
             } catch (error) {
               core.error(`failed to parseContent. err: ${error.message}`);

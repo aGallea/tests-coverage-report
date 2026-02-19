@@ -64,7 +64,6 @@ const unpackage = (coverage: any, pwd: string): CoverInfo[] => {
     const branches = extractLcovStyleBranches(c);
     const classCov: CoverInfo = {
       title: c.$.name,
-      // file: c.$.filename,
       file: path.join(source, c.$.filename).replace(pwd, ''),
       functions: {
         found: c.methods && c.methods[0].method ? c.methods[0].method.length : 0,
@@ -145,8 +144,6 @@ export const parseFile = async (file: string, pwd: string): Promise<CoverInfo[]>
           } else {
             try {
               const info = await parseContent(data, pwd);
-              // console.log('====== cobertura ======');
-              // console.log(JSON.stringify(info, null, 2));
               resolve(info);
             } catch (error) {
               core.error(`failed to parseContent. err: ${error.message}`);

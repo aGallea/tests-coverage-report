@@ -117,8 +117,6 @@ const parseFile = async (file: string): Promise<Junit | undefined> => {
       } else {
         try {
           const info = await parseContent(data);
-          // console.log('====== junit ======');
-          // console.log(JSON.stringify(info, null, 2));
           resolve(info);
         } catch (error) {
           core.error(`failed to parseContent. err: ${error.message}`);

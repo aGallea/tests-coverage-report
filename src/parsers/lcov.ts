@@ -121,8 +121,6 @@ export function parseFile(file: string): Promise<CoverInfo[]> {
           } else {
             try {
               const info = parseContent(data);
-              // console.log('====== lcov ======');
-              // console.log(JSON.stringify(info, null, 2));
               resolve(info);
             } catch (error) {
               core.error(`failed to parseContent. err: ${error.message}`);
