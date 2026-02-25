@@ -171,6 +171,28 @@ describe('diffCover tests', () => {
           '2',
           '3',
           '4',
+          '10',
+          '11',
+          '12',
+          '13',
+          '17',
+          '18',
+          '19',
+          '20',
+          '21',
+          '22',
+          '29',
+          '30',
+        ],
+        file: 'src/main.ts',
+        missedLines: ['18', '19', '20', '21', '22', '29', '30'],
+      });
+      expect(DiffInfo[1]).toEqual({
+        changedLines: [
+          '1',
+          '2',
+          '3',
+          '4',
           '5',
           '51',
           '52',
@@ -203,28 +225,175 @@ describe('diffCover tests', () => {
           '83',
         ],
       });
-      expect(DiffInfo[1]).toEqual({
-        changedLines: [
-          '1',
-          '2',
-          '3',
-          '4',
-          '10',
-          '11',
-          '12',
-          '13',
-          '17',
-          '18',
-          '19',
-          '20',
-          '21',
-          '22',
-          '29',
-          '30',
-        ],
-        file: 'src/main.ts',
-        missedLines: ['18', '19', '20', '21', '22', '29', '30'],
-      });
+    });
+  });
+
+  test('changed files not in coverage report should appear as 0% covered', async () => {
+    jest
+      .spyOn(Utils, 'execFileCommand')
+      .mockImplementation(
+        async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+          if (args[0] === 'log') {
+            return {
+              status: 'success',
+              stdout: 'abc1234\ndef5678\n',
+            };
+          }
+          if (args[0] === 'blame' && args.includes('src/newScreen.tsx')) {
+            const blameLines = [1, 2, 3, 4, 5];
+            return {
+              status: 'success',
+              stdout: blameLines
+                .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                .join('\n'),
+            };
+          }
+          if (args[0] === 'blame' && args.includes('src/newHelper.ts')) {
+            const blameLines = [1, 2, 3];
+            return {
+              status: 'success',
+              stdout: blameLines
+                .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                .join('\n'),
+            };
+          }
+          return { status: 'success', stdout: '' };
+        },
+      );
+    const eventInfo: EventInfo = getEventInfo();
+    eventInfo.showDiffcover = true;
+    eventInfo.diffcoverRef = 'cobertura';
+    const cobertura = await parseFile(
+      './test/assets/cobertura-coverage.xml',
+      '/Users/user/workspace/private/tests-coverage-report/',
+    );
+    const coverageInfo: CoverageTypeInfo = {
+      cobertura,
+      clover: [],
+      lcov: [],
+      jacoco: [],
+      junit: undefined,
+    };
+    const filesStatus = getFilesStatus();
+    filesStatus.added = ['src/newScreen.tsx', 'src/newHelper.ts'];
+    const result: DiffInfo[] = await diffCover(eventInfo, filesStatus, coverageInfo);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({
+      file: 'src/newScreen.tsx',
+      changedLines: ['1', '2', '3', '4', '5'],
+      missedLines: ['1', '2', '3', '4', '5'],
+    });
+    expect(result[1]).toEqual({
+      file: 'src/newHelper.ts',
+      changedLines: ['1', '2', '3'],
+      missedLines: ['1', '2', '3'],
+    });
+  });
+
+  test('mixed: files with and without coverage data', async () => {
+    jest
+      .spyOn(Utils, 'execFileCommand')
+      .mockImplementation(
+        async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+          if (args[0] === 'log') {
+            return {
+              status: 'success',
+              stdout: 'abc1234\n',
+            };
+          }
+          if (args[0] === 'blame' && args.includes('src/main.ts')) {
+            const blameLines = [1, 2, 3, 18, 19];
+            return {
+              status: 'success',
+              stdout: blameLines
+                .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                .join('\n'),
+            };
+          }
+          if (args[0] === 'blame' && args.includes('src/brandNewFile.ts')) {
+            const blameLines = [1, 2];
+            return {
+              status: 'success',
+              stdout: blameLines
+                .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                .join('\n'),
+            };
+          }
+          return { status: 'success', stdout: '' };
+        },
+      );
+    const eventInfo: EventInfo = getEventInfo();
+    eventInfo.showDiffcover = true;
+    eventInfo.diffcoverRef = 'cobertura';
+    const cobertura = await parseFile(
+      './test/assets/cobertura-coverage.xml',
+      '/Users/user/workspace/private/tests-coverage-report/',
+    );
+    const coverageInfo: CoverageTypeInfo = {
+      cobertura,
+      clover: [],
+      lcov: [],
+      jacoco: [],
+      junit: undefined,
+    };
+    const filesStatus = getFilesStatus();
+    filesStatus.modified = ['src/main.ts'];
+    filesStatus.added = ['src/brandNewFile.ts'];
+    const result: DiffInfo[] = await diffCover(eventInfo, filesStatus, coverageInfo);
+    expect(result).toHaveLength(2);
+    const mainResult = result.find((r) => r.file === 'src/main.ts');
+    expect(mainResult).toBeDefined();
+    expect(mainResult!.changedLines).toEqual(['1', '2', '3', '18', '19']);
+    const newFileResult = result.find((r) => r.file === 'src/brandNewFile.ts');
+    expect(newFileResult).toBeDefined();
+    expect(newFileResult!).toEqual({
+      file: 'src/brandNewFile.ts',
+      changedLines: ['1', '2'],
+      missedLines: ['1', '2'],
+    });
+  });
+
+  test('empty coverage array with changed files should show 0% covered', async () => {
+    jest
+      .spyOn(Utils, 'execFileCommand')
+      .mockImplementation(
+        async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+          if (args[0] === 'log') {
+            return {
+              status: 'success',
+              stdout: 'abc1234\n',
+            };
+          }
+          if (args[0] === 'blame' && args.includes('src/orphan.ts')) {
+            const blameLines = [1, 2, 3, 4];
+            return {
+              status: 'success',
+              stdout: blameLines
+                .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                .join('\n'),
+            };
+          }
+          return { status: 'success', stdout: '' };
+        },
+      );
+    const eventInfo: EventInfo = getEventInfo();
+    eventInfo.showDiffcover = true;
+    eventInfo.diffcoverRef = 'cobertura';
+    const coverageInfo: CoverageTypeInfo = {
+      cobertura: [],
+      clover: [],
+      lcov: [],
+      jacoco: [],
+      junit: undefined,
+    };
+    const filesStatus = getFilesStatus();
+    filesStatus.added = ['src/orphan.ts'];
+    const result: DiffInfo[] = await diffCover(eventInfo, filesStatus, coverageInfo);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      file: 'src/orphan.ts',
+      changedLines: ['1', '2', '3', '4'],
+      missedLines: ['1', '2', '3', '4'],
     });
   });
 

@@ -66,47 +66,49 @@ const getDiff = async (
 ): Promise<DiffInfo[]> => {
   const commitSet = new Set(commitsSha);
   const diffInfo: DiffInfo[] = [];
-  for (const fileCoverInfo of coverageInfo[referral]) {
-    for (const currFile of changedFiles) {
-      const changedLinesExec = await execFileCommand('git', ['blame', '-p', currFile]);
-      if (changedLinesExec.status === 'success') {
-        const changedLines = parseBlameForCommits(
-          changedLinesExec.stdout || '',
-          commitSet,
+  const coverageEntries = coverageInfo[referral];
+  for (const currFile of changedFiles) {
+    const changedLinesExec = await execFileCommand('git', ['blame', '-p', currFile]);
+    if (changedLinesExec.status === 'success') {
+      const changedLines = parseBlameForCommits(changedLinesExec.stdout || '', commitSet);
+      if (changedLines.length) {
+        const fileCoverInfo = coverageEntries.find(
+          (entry) =>
+            entry.file === currFile ||
+            currFile.includes(entry.file) ||
+            entry.file.includes(currFile),
         );
-        if (changedLines.length) {
-          if (fileCoverInfo.lines.details.length) {
-            if (
-              fileCoverInfo.file === currFile ||
-              currFile.includes(fileCoverInfo.file) ||
-              fileCoverInfo.file.includes(currFile)
-            ) {
-              const misses = changedLines.filter(
-                (changedLine: string) =>
-                  fileCoverInfo.lines.details.find(
-                    (details) => details.line === +changedLine,
-                  )?.hit === 0,
-              );
-              core.info(`diffCover on file=${currFile}`);
-              core.info(`misses: [${misses}]`);
-              core.info(
-                `coverage: ${Math.round(
-                  (1 - misses.length / changedLines.length) * 100,
-                )}%`,
-              );
-              diffInfo.push({
-                file: currFile,
-                missedLines: misses,
-                changedLines: changedLines,
-              });
-            }
-          }
+        if (fileCoverInfo && fileCoverInfo.lines.details.length) {
+          const misses = changedLines.filter(
+            (changedLine: string) =>
+              fileCoverInfo.lines.details.find((details) => details.line === +changedLine)
+                ?.hit === 0,
+          );
+          core.info(`diffCover on file=${currFile}`);
+          core.info(`misses: [${misses}]`);
+          core.info(
+            `coverage: ${Math.round((1 - misses.length / changedLines.length) * 100)}%`,
+          );
+          diffInfo.push({
+            file: currFile,
+            missedLines: misses,
+            changedLines: changedLines,
+          });
+        } else {
+          core.info(`diffCover on file=${currFile} (no coverage data)`);
+          core.info(`misses: [${changedLines}]`);
+          core.info(`coverage: 0%`);
+          diffInfo.push({
+            file: currFile,
+            missedLines: changedLines,
+            changedLines: changedLines,
+          });
         }
-      } else {
-        throw new Error(
-          `failed to execute "git blame" on file: ${currFile}. error: ${changedLinesExec.message}`,
-        );
       }
+    } else {
+      throw new Error(
+        `failed to execute "git blame" on file: ${currFile}. error: ${changedLinesExec.message}`,
+      );
     }
   }
   return diffInfo;
