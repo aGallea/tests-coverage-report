@@ -8,6 +8,68 @@ import {
 import { execFileCommand } from './utils';
 import * as core from '@actions/core';
 
+const CODE_FILE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.py',
+  '.java',
+  '.kt',
+  '.kts',
+  '.go',
+  '.rb',
+  '.cs',
+  '.cpp',
+  '.cc',
+  '.cxx',
+  '.c',
+  '.h',
+  '.hpp',
+  '.hxx',
+  '.swift',
+  '.rs',
+  '.scala',
+  '.sc',
+  '.php',
+  '.m',
+  '.mm',
+  '.groovy',
+  '.gvy',
+  '.lua',
+  '.r',
+  '.R',
+  '.pl',
+  '.pm',
+  '.ex',
+  '.exs',
+  '.erl',
+  '.hrl',
+  '.clj',
+  '.cljs',
+  '.dart',
+  '.vue',
+  '.svelte',
+]);
+
+const TEST_FILE_PATTERNS = [
+  /\.test\./i,
+  /\.spec\./i,
+  /(^|\/)__tests__\//i,
+  /(^|\/)test\//i,
+  /(^|\/)tests\//i,
+];
+
+export const isCodeFile = (filePath: string): boolean => {
+  const lastDot = filePath.lastIndexOf('.');
+  if (lastDot === -1) return false;
+  const ext = filePath.substring(lastDot).toLowerCase();
+  if (!CODE_FILE_EXTENSIONS.has(ext)) return false;
+  return !TEST_FILE_PATTERNS.some((pattern) => pattern.test(filePath));
+};
+
 export const diffCover = async (
   eventInfo: EventInfo,
   filesStatus: FilesStatus,
@@ -67,7 +129,7 @@ const getDiff = async (
   const commitSet = new Set(commitsSha);
   const diffInfo: DiffInfo[] = [];
   const coverageEntries = coverageInfo[referral];
-  for (const currFile of changedFiles) {
+  for (const currFile of changedFiles.filter(isCodeFile)) {
     const changedLinesExec = await execFileCommand('git', ['blame', '-p', currFile]);
     if (changedLinesExec.status === 'success') {
       const changedLines = parseBlameForCommits(changedLinesExec.stdout || '', commitSet);

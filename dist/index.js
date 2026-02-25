@@ -294,9 +294,71 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseBlameForCommits = exports.diffCover = void 0;
+exports.parseBlameForCommits = exports.diffCover = exports.isCodeFile = void 0;
 const utils_1 = __nccwpck_require__(9217);
 const core = __importStar(__nccwpck_require__(7484));
+const CODE_FILE_EXTENSIONS = new Set([
+    '.ts',
+    '.tsx',
+    '.js',
+    '.jsx',
+    '.mjs',
+    '.cjs',
+    '.py',
+    '.java',
+    '.kt',
+    '.kts',
+    '.go',
+    '.rb',
+    '.cs',
+    '.cpp',
+    '.cc',
+    '.cxx',
+    '.c',
+    '.h',
+    '.hpp',
+    '.hxx',
+    '.swift',
+    '.rs',
+    '.scala',
+    '.sc',
+    '.php',
+    '.m',
+    '.mm',
+    '.groovy',
+    '.gvy',
+    '.lua',
+    '.r',
+    '.R',
+    '.pl',
+    '.pm',
+    '.ex',
+    '.exs',
+    '.erl',
+    '.hrl',
+    '.clj',
+    '.cljs',
+    '.dart',
+    '.vue',
+    '.svelte',
+]);
+const TEST_FILE_PATTERNS = [
+    /\.test\./i,
+    /\.spec\./i,
+    /(^|\/)__tests__\//i,
+    /(^|\/)test\//i,
+    /(^|\/)tests\//i,
+];
+const isCodeFile = (filePath) => {
+    const lastDot = filePath.lastIndexOf('.');
+    if (lastDot === -1)
+        return false;
+    const ext = filePath.substring(lastDot).toLowerCase();
+    if (!CODE_FILE_EXTENSIONS.has(ext))
+        return false;
+    return !TEST_FILE_PATTERNS.some((pattern) => pattern.test(filePath));
+};
+exports.isCodeFile = isCodeFile;
 const diffCover = async (eventInfo, filesStatus, coverageInfo) => {
     if (eventInfo.showDiffcover) {
         const gitLogExec = await (0, utils_1.execFileCommand)('git', [
@@ -341,7 +403,7 @@ const getDiff = async (coverageInfo, changedFiles, commitsSha, referral) => {
     const commitSet = new Set(commitsSha);
     const diffInfo = [];
     const coverageEntries = coverageInfo[referral];
-    for (const currFile of changedFiles) {
+    for (const currFile of changedFiles.filter(exports.isCodeFile)) {
         const changedLinesExec = await (0, utils_1.execFileCommand)('git', ['blame', '-p', currFile]);
         if (changedLinesExec.status === 'success') {
             const changedLines = (0, exports.parseBlameForCommits)(changedLinesExec.stdout || '', commitSet);

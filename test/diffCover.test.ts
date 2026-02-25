@@ -2,7 +2,7 @@ import { spyActions } from './actions.spy';
 import * as github from '@actions/github';
 import { CoverageTypeInfo, EventInfo, FilesStatus, DiffInfo } from '../src/types';
 import { getEventInfo } from '../src/eventInfo';
-import { diffCover, parseBlameForCommits } from '../src/diffCover';
+import { diffCover, parseBlameForCommits, isCodeFile } from '../src/diffCover';
 import { parseFile } from '../src/parsers/cobertura';
 import * as Utils from '../src/utils';
 
@@ -397,6 +397,211 @@ describe('diffCover tests', () => {
     });
   });
 
+  describe('Non-code file filtering', () => {
+    test('non-code files (yaml, sql, md) should be excluded from diff coverage', async () => {
+      jest
+        .spyOn(Utils, 'execFileCommand')
+        .mockImplementation(
+          async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+            if (args[0] === 'log') {
+              return {
+                status: 'success',
+                stdout: 'abc1234\n',
+              };
+            }
+            // If git blame is called for non-code files, it means they weren't filtered
+            if (
+              args[0] === 'blame' &&
+              (args.includes('config/settings.yaml') ||
+                args.includes('db/migration.sql') ||
+                args.includes('docs/README.md'))
+            ) {
+              const blameLines = [1, 2, 3];
+              return {
+                status: 'success',
+                stdout: blameLines
+                  .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                  .join('\n'),
+              };
+            }
+            return { status: 'success', stdout: '' };
+          },
+        );
+      const eventInfo: EventInfo = getEventInfo();
+      eventInfo.showDiffcover = true;
+      eventInfo.diffcoverRef = 'cobertura';
+      const coverageInfo: CoverageTypeInfo = {
+        cobertura: [],
+        clover: [],
+        lcov: [],
+        jacoco: [],
+        junit: undefined,
+      };
+      const filesStatus = getFilesStatus();
+      filesStatus.added = ['config/settings.yaml', 'db/migration.sql', 'docs/README.md'];
+      const result: DiffInfo[] = await diffCover(eventInfo, filesStatus, coverageInfo);
+      expect(result).toHaveLength(0);
+    });
+
+    test('mixed code and non-code files should only include code files', async () => {
+      jest
+        .spyOn(Utils, 'execFileCommand')
+        .mockImplementation(
+          async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+            if (args[0] === 'log') {
+              return {
+                status: 'success',
+                stdout: 'abc1234\n',
+              };
+            }
+            if (args[0] === 'blame' && args.includes('src/feature.ts')) {
+              const blameLines = [1, 2, 3];
+              return {
+                status: 'success',
+                stdout: blameLines
+                  .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                  .join('\n'),
+              };
+            }
+            if (args[0] === 'blame' && args.includes('config/app.yml')) {
+              const blameLines = [1, 2];
+              return {
+                status: 'success',
+                stdout: blameLines
+                  .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                  .join('\n'),
+              };
+            }
+            if (args[0] === 'blame' && args.includes('schema.json')) {
+              const blameLines = [1];
+              return {
+                status: 'success',
+                stdout: blameLines
+                  .map((ln) => `abc1234000000000000000000000000000000000 ${ln} ${ln} 1`)
+                  .join('\n'),
+              };
+            }
+            return { status: 'success', stdout: '' };
+          },
+        );
+      const eventInfo: EventInfo = getEventInfo();
+      eventInfo.showDiffcover = true;
+      eventInfo.diffcoverRef = 'cobertura';
+      const coverageInfo: CoverageTypeInfo = {
+        cobertura: [],
+        clover: [],
+        lcov: [],
+        jacoco: [],
+        junit: undefined,
+      };
+      const filesStatus = getFilesStatus();
+      filesStatus.added = ['src/feature.ts'];
+      filesStatus.modified = ['config/app.yml', 'schema.json'];
+      const result: DiffInfo[] = await diffCover(eventInfo, filesStatus, coverageInfo);
+      expect(result).toHaveLength(1);
+      expect(result[0].file).toBe('src/feature.ts');
+    });
+
+    test('various code file extensions should be included', async () => {
+      const codeFiles = [
+        'src/App.tsx',
+        'src/utils.jsx',
+        'lib/main.py',
+        'src/Main.java',
+        'src/main.go',
+        'src/main.rb',
+        'src/main.cs',
+        'src/main.cpp',
+        'src/main.c',
+        'src/main.swift',
+        'src/main.rs',
+        'src/main.scala',
+        'src/main.php',
+        'src/main.kt',
+      ];
+      jest
+        .spyOn(Utils, 'execFileCommand')
+        .mockImplementation(
+          async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+            if (args[0] === 'log') {
+              return {
+                status: 'success',
+                stdout: 'abc1234\n',
+              };
+            }
+            if (args[0] === 'blame') {
+              return {
+                status: 'success',
+                stdout: 'abc1234000000000000000000000000000000000 1 1 1',
+              };
+            }
+            return { status: 'success', stdout: '' };
+          },
+        );
+      const eventInfo: EventInfo = getEventInfo();
+      eventInfo.showDiffcover = true;
+      eventInfo.diffcoverRef = 'cobertura';
+      const coverageInfo: CoverageTypeInfo = {
+        cobertura: [],
+        clover: [],
+        lcov: [],
+        jacoco: [],
+        junit: undefined,
+      };
+      const filesStatus = getFilesStatus();
+      filesStatus.added = codeFiles;
+      const result: DiffInfo[] = await diffCover(eventInfo, filesStatus, coverageInfo);
+      expect(result).toHaveLength(codeFiles.length);
+      const resultFiles = result.map((r) => r.file);
+      for (const codeFile of codeFiles) {
+        expect(resultFiles).toContain(codeFile);
+      }
+    });
+  });
+
+  test('test files should be excluded from diff coverage', async () => {
+    jest
+      .spyOn(Utils, 'execFileCommand')
+      .mockImplementation(
+        async (file: string, args: string[]): Promise<Utils.ExecInfo> => {
+          if (args[0] === 'log') {
+            return {
+              status: 'success',
+              stdout: 'abc1234\n',
+            };
+          }
+          if (args[0] === 'blame') {
+            return {
+              status: 'success',
+              stdout: 'abc1234000000000000000000000000000000000 1 1 1',
+            };
+          }
+          return { status: 'success', stdout: '' };
+        },
+      );
+    const eventInfo: EventInfo = getEventInfo();
+    eventInfo.showDiffcover = true;
+    eventInfo.diffcoverRef = 'cobertura';
+    const coverageInfo: CoverageTypeInfo = {
+      cobertura: [],
+      clover: [],
+      lcov: [],
+      jacoco: [],
+      junit: undefined,
+    };
+    const filesStatus = getFilesStatus();
+    filesStatus.added = ['src/feature.ts'];
+    filesStatus.modified = [
+      'src/feature.test.ts',
+      'src/feature.spec.ts',
+      'test/feature.ts',
+      '__tests__/feature.ts',
+    ];
+    const result: DiffInfo[] = await diffCover(eventInfo, filesStatus, coverageInfo);
+    expect(result).toHaveLength(1);
+    expect(result[0].file).toBe('src/feature.ts');
+  });
+
   describe('Exceptions', () => {
     test('invalid git log', async () => {
       const eventInfo: EventInfo = getEventInfo();
@@ -506,5 +711,100 @@ describe('parseBlameForCommits', () => {
     const commitSet = new Set(['abc1234']);
     const result = parseBlameForCommits(blameOutput, commitSet);
     expect(result).toEqual(['10']);
+  });
+});
+
+describe('isCodeFile', () => {
+  test('accepts common code file extensions', () => {
+    const codeFiles = [
+      'src/main.ts',
+      'src/App.tsx',
+      'src/index.js',
+      'src/Component.jsx',
+      'lib/utils.mjs',
+      'lib/config.cjs',
+      'app/main.py',
+      'src/Main.java',
+      'src/main.kt',
+      'src/main.go',
+      'src/main.rb',
+      'src/main.cs',
+      'src/main.cpp',
+      'src/main.c',
+      'src/main.h',
+      'src/main.swift',
+      'src/main.rs',
+      'src/main.scala',
+      'src/main.php',
+      'src/main.dart',
+      'src/App.vue',
+      'src/App.svelte',
+    ];
+    for (const file of codeFiles) {
+      expect(isCodeFile(file)).toBe(true);
+    }
+  });
+
+  test('rejects non-code file extensions', () => {
+    const nonCodeFiles = [
+      'config/settings.yaml',
+      'config/settings.yml',
+      'db/migration.sql',
+      'docs/README.md',
+      'data/sample.json',
+      'config/app.xml',
+      'data/report.csv',
+      'assets/logo.png',
+      'assets/icon.svg',
+      'styles/main.css',
+      'styles/main.scss',
+      'styles/main.less',
+      'templates/page.html',
+      'data/file.txt',
+      'config/.env',
+      'Dockerfile',
+      'Makefile',
+    ];
+    for (const file of nonCodeFiles) {
+      expect(isCodeFile(file)).toBe(false);
+    }
+  });
+
+  test('rejects files without extensions', () => {
+    expect(isCodeFile('Dockerfile')).toBe(false);
+    expect(isCodeFile('Makefile')).toBe(false);
+    expect(isCodeFile('LICENSE')).toBe(false);
+  });
+
+  test('is case-insensitive for extensions', () => {
+    expect(isCodeFile('src/Main.TS')).toBe(true);
+    expect(isCodeFile('src/Main.Py')).toBe(true);
+    expect(isCodeFile('src/Main.JAVA')).toBe(true);
+  });
+
+  test('excludes test files', () => {
+    const testFiles = [
+      'src/main.test.ts',
+      'src/main.test.js',
+      'src/main.spec.ts',
+      'src/main.spec.js',
+      'src/Main.test.java',
+      'src/Main.spec.py',
+      '__tests__/main.ts',
+      '__tests__/utils/helper.js',
+      'test/main.ts',
+      'test/parsers/cobertura.ts',
+      'tests/unit/main.py',
+      'tests/integration/api.java',
+    ];
+    for (const file of testFiles) {
+      expect(isCodeFile(file)).toBe(false);
+    }
+  });
+
+  test('includes source files in directories containing test-like words', () => {
+    // 'test' in filename but not matching test patterns
+    expect(isCodeFile('src/testUtils.ts')).toBe(true);
+    expect(isCodeFile('src/contestEntry.java')).toBe(true);
   });
 });
