@@ -67,5 +67,5 @@ outputs:
     description: Value indicating the coverage percentage of your report based on Jest, example 78
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.js
