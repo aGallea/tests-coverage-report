@@ -5,6 +5,12 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.12](https://github.com/aGallea/tests-coverage-report/compare/1.3.11...1.3.12) (2026-03-21)
+
+### Bug Fixes
+
+* upgrade Node.js from 20/22 to 24 ([#75](https://github.com/aGallea/tests-coverage-report/issues/75)) ([e00d2b9](https://github.com/aGallea/tests-coverage-report/commit/e00d2b9db8f40885b6d6ffdd5094ba8ee6889b72))
+
 ## [1.3.11](https://github.com/aGallea/tests-coverage-report/compare/1.3.10...1.3.11) (2026-02-18)
 
 ### Bug Fixes
