@@ -5,6 +5,12 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.14](https://github.com/aGallea/tests-coverage-report/compare/1.3.13...1.3.14) (2026-03-25)
+
+### Bug Fixes
+
+* support variable-length abbreviated SHAs in blame matching ([#77](https://github.com/aGallea/tests-coverage-report/issues/77)) ([1a271bb](https://github.com/aGallea/tests-coverage-report/commit/1a271bbd97a82cc606d5de2f0edb0e3005139ed1))
+
 ## [1.3.13](https://github.com/aGallea/tests-coverage-report/compare/1.3.12...1.3.13) (2026-03-25)
 
 ### Bug Fixes
