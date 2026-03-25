@@ -348,12 +348,15 @@ exports.diffCover = diffCover;
 const parseBlameForCommits = (blameOutput, commitSet) => {
     const lines = [];
     const blameLineRegex = /^([0-9a-f]{40})\s+\d+\s+(\d+)(?:\s+\d+)?$/;
+    // Determine the abbreviated SHA length from the commit set (git log --format=%h
+    // produces variable-length hashes depending on core.abbrev / repo size).
+    const abbrevLen = commitSet.size > 0 ? [...commitSet][0].length : 7;
     for (const line of blameOutput.split('\n')) {
         const match = blameLineRegex.exec(line);
         if (match) {
             const fullSha = match[1];
             const lineNumber = match[2];
-            const shortSha = fullSha.substring(0, 7);
+            const shortSha = fullSha.substring(0, abbrevLen);
             if (commitSet.has(shortSha) || commitSet.has(fullSha)) {
                 lines.push(lineNumber);
             }

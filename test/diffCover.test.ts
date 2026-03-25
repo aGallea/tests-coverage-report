@@ -338,4 +338,42 @@ describe('parseBlameForCommits', () => {
     const result = parseBlameForCommits(blameOutput, commitSet);
     expect(result).toEqual(['10']);
   });
+
+  test('matches 9-char abbreviated SHA from git log', () => {
+    const blameOutput = [
+      'edf7beeb00000000000000000000000000000000 1 1 1',
+      'author Test User',
+      '176dba7500000000000000000000000000000000 2 2 1',
+      'author Test User',
+      'aaaa000000000000000000000000000000000000 3 3 1',
+      'author Test User',
+    ].join('\n');
+    const commitSet = new Set(['edf7beeb0', '176dba750']);
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual(['1', '2']);
+  });
+
+  test('matches 8-char abbreviated SHA', () => {
+    const fullSha = 'abcdef12' + '0'.repeat(32); // 40 chars
+    const blameOutput = `${fullSha} 5 5 1`;
+    const commitSet = new Set(['abcdef12']);
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual(['5']);
+  });
+
+  test('does not false-match when abbrev length differs', () => {
+    // commitSet has 9-char SHAs, blame has a SHA that matches first 7 chars but not 9
+    const fullSha = 'abc123400' + '0'.repeat(31); // 40 chars
+    const blameOutput = `${fullSha} 1 1 1`;
+    const commitSet = new Set(['abc1234ff']); // 9 chars, last 2 differ
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual([]);
+  });
+
+  test('handles empty commit set gracefully', () => {
+    const blameOutput = 'abc1234000000000000000000000000000000000 1 1 1';
+    const commitSet = new Set<string>();
+    const result = parseBlameForCommits(blameOutput, commitSet);
+    expect(result).toEqual([]);
+  });
 });
