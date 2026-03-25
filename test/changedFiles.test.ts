@@ -85,21 +85,17 @@ describe('eventInput tests', () => {
       filename: `page2-${i}.file`,
     }));
 
-    const mockCompare = jest
+    const mockListFiles = jest
       .fn()
-      .mockResolvedValueOnce({
-        data: { total_commits: 1, files: page1Files },
-      })
-      .mockResolvedValueOnce({
-        data: { total_commits: 1, files: page2Files },
-      });
+      .mockResolvedValueOnce({ data: page1Files })
+      .mockResolvedValueOnce({ data: page2Files });
 
     jest.spyOn(github, 'getOctokit').mockImplementation(
       () =>
         ({
           rest: {
-            repos: {
-              compareCommitsWithBasehead: mockCompare,
+            pulls: {
+              listFiles: mockListFiles,
             },
           },
         }) as any,
@@ -111,26 +107,23 @@ describe('eventInput tests', () => {
     expect(filesStatus.all).toHaveLength(60);
     expect(filesStatus.added).toHaveLength(50);
     expect(filesStatus.modified).toHaveLength(10);
-    expect(mockCompare).toHaveBeenCalledTimes(2);
+    expect(mockListFiles).toHaveBeenCalledTimes(2);
   });
 
   test('getChangedFiles skips files with unknown status', async () => {
-    const mockCompare = jest.fn().mockResolvedValueOnce({
-      data: {
-        total_commits: 1,
-        files: [
-          { status: 'added', filename: 'known.file' },
-          { status: 'unknown_status', filename: 'unknown.file' },
-        ],
-      },
+    const mockListFiles = jest.fn().mockResolvedValueOnce({
+      data: [
+        { status: 'added', filename: 'known.file' },
+        { status: 'unknown_status', filename: 'unknown.file' },
+      ],
     });
 
     jest.spyOn(github, 'getOctokit').mockImplementation(
       () =>
         ({
           rest: {
-            repos: {
-              compareCommitsWithBasehead: mockCompare,
+            pulls: {
+              listFiles: mockListFiles,
             },
           },
         }) as any,
@@ -145,16 +138,16 @@ describe('eventInput tests', () => {
   });
 
   test('getChangedFiles handles empty files response', async () => {
-    const mockCompare = jest.fn().mockResolvedValueOnce({
-      data: { total_commits: 0, files: undefined },
+    const mockListFiles = jest.fn().mockResolvedValueOnce({
+      data: [],
     });
 
     jest.spyOn(github, 'getOctokit').mockImplementation(
       () =>
         ({
           rest: {
-            repos: {
-              compareCommitsWithBasehead: mockCompare,
+            pulls: {
+              listFiles: mockListFiles,
             },
           },
         }) as any,

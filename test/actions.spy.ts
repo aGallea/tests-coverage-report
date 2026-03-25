@@ -69,6 +69,11 @@ export function spyActions(data = defaultData, eventName = 'pull_request') {
               data: data.compareCommitsWithBasehead,
             })),
           },
+          pulls: {
+            listFiles: jest.fn(async () => ({
+              data: data.compareCommitsWithBasehead.files || [],
+            })),
+          },
         },
       }) as any,
   );

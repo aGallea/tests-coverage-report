@@ -29,6 +29,7 @@ export interface EventInfo {
   commitSha: string;
   headRef: string;
   baseRef: string;
+  prNumber: number | undefined;
   pwd: string;
   filesStatus?: FilesStatus;
 }

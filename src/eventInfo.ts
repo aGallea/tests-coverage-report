@@ -38,12 +38,14 @@ export const getEventInfo = (): EventInfo => {
     commitSha: '',
     headRef: '',
     baseRef: '',
+    prNumber: undefined,
     pwd: process.env.GITHUB_WORKSPACE || '',
   };
   if (context.eventName === 'pull_request' && context.payload) {
     eventInfo.commitSha = context.payload.pull_request?.head.sha;
     eventInfo.headRef = context.payload.pull_request?.head.ref;
     eventInfo.baseRef = context.payload.pull_request?.base.ref;
+    eventInfo.prNumber = context.payload.pull_request?.number;
   } else if (context.eventName === 'push') {
     eventInfo.commitSha = context.payload.after;
     eventInfo.headRef = context.ref;
