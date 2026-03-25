@@ -5,6 +5,12 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.13](https://github.com/aGallea/tests-coverage-report/compare/1.3.12...1.3.13) (2026-03-25)
+
+### Bug Fixes
+
+* use pulls.listFiles API for PR changed files ([#76](https://github.com/aGallea/tests-coverage-report/issues/76)) ([ec51509](https://github.com/aGallea/tests-coverage-report/commit/ec515099784ebcb5610f61b2814523ec73415cc7))
+
 ## [1.3.12](https://github.com/aGallea/tests-coverage-report/compare/1.3.11...1.3.12) (2026-03-21)
 
 ### Bug Fixes
