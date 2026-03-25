@@ -33,6 +33,36 @@ describe('main tests', () => {
       '<!-- tests-coverage-report -->\n## Tests Report Mock :page_facing_up:\n',
     );
   });
+  test('getChangedFiles failure logs warning and continues', async () => {
+    // Mock getChangedFiles to throw
+    jest.spyOn(github, 'getOctokit').mockImplementation(
+      () =>
+        ({
+          rest: {
+            pulls: {
+              listFiles: jest.fn().mockRejectedValue(new Error('API rate limit')),
+            },
+          },
+        }) as any,
+    );
+
+    const commentCoverageSpy = jest
+      .spyOn(Comment, 'commentCoverage')
+      .mockImplementation(async (): Promise<void> => {
+        return;
+      });
+    const warningSpy = jest.spyOn(core, 'warning');
+
+    await main();
+
+    // Should warn but not fail
+    expect(warningSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to get changed files'),
+    );
+    // Should still post the coverage comment
+    expect(commentCoverageSpy).toHaveBeenCalled();
+  });
+
   test('exception', async () => {
     jest
       .spyOn(Comment, 'commentCoverage')
