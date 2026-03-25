@@ -9,40 +9,65 @@
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedFiles = void 0;
 const github_1 = __nccwpck_require__(3228);
+const emptyFilesStatus = () => ({
+    all: [],
+    added: [],
+    removed: [],
+    modified: [],
+    renamed: [],
+    copied: [],
+    changed: [],
+    unchanged: [],
+});
+const addFile = (allFiles, filename, status) => {
+    allFiles.all.push(filename);
+    const key = status;
+    if (key !== 'all' && key in allFiles) {
+        allFiles[key].push(filename);
+    }
+};
 const getChangedFiles = async (eventInfo) => {
-    const allFiles = {
-        all: [],
-        added: [],
-        removed: [],
-        modified: [],
-        renamed: [],
-        copied: [],
-        changed: [],
-        unchanged: [],
-    };
+    const allFiles = emptyFilesStatus();
     const octokit = (0, github_1.getOctokit)(eventInfo.token);
-    const perPage = 50;
-    let currPage = 1;
-    let hasMorePages = true;
-    while (hasMorePages) {
-        const { data: { files }, } = await octokit.rest.repos.compareCommitsWithBasehead({
-            owner: eventInfo.owner,
-            repo: eventInfo.repo,
-            basehead: `${eventInfo.baseRef}...${eventInfo.headRef}`,
-            per_page: perPage,
-            page: currPage,
-        });
-        if (files) {
+    if (eventInfo.prNumber) {
+        const perPage = 50;
+        let currPage = 1;
+        let hasMorePages = true;
+        while (hasMorePages) {
+            const { data: files } = await octokit.rest.pulls.listFiles({
+                owner: eventInfo.owner,
+                repo: eventInfo.repo,
+                pull_number: eventInfo.prNumber,
+                per_page: perPage,
+                page: currPage,
+            });
             for (const file of files) {
-                allFiles.all.push(file.filename);
-                const status = `${file.status}`;
-                if (status !== 'all' && status in allFiles) {
-                    allFiles[status].push(file.filename);
+                addFile(allFiles, file.filename, `${file.status}`);
+            }
+            hasMorePages = files.length >= perPage;
+            currPage++;
+        }
+    }
+    else if (eventInfo.baseRef && eventInfo.headRef) {
+        const perPage = 50;
+        let currPage = 1;
+        let hasMorePages = true;
+        while (hasMorePages) {
+            const { data: { files }, } = await octokit.rest.repos.compareCommitsWithBasehead({
+                owner: eventInfo.owner,
+                repo: eventInfo.repo,
+                basehead: `${eventInfo.baseRef}...${eventInfo.headRef}`,
+                per_page: perPage,
+                page: currPage,
+            });
+            if (files) {
+                for (const file of files) {
+                    addFile(allFiles, file.filename, `${file.status}`);
                 }
             }
+            hasMorePages = (files?.length ?? 0) >= perPage;
+            currPage++;
         }
-        hasMorePages = (files?.length ?? 0) >= perPage;
-        currPage++;
     }
     return allFiles;
 };
@@ -450,12 +475,14 @@ const getEventInfo = () => {
         commitSha: '',
         headRef: '',
         baseRef: '',
+        prNumber: undefined,
         pwd: process.env.GITHUB_WORKSPACE || '',
     };
     if (github_1.context.eventName === 'pull_request' && github_1.context.payload) {
         eventInfo.commitSha = github_1.context.payload.pull_request?.head.sha;
         eventInfo.headRef = github_1.context.payload.pull_request?.head.ref;
         eventInfo.baseRef = github_1.context.payload.pull_request?.base.ref;
+        eventInfo.prNumber = github_1.context.payload.pull_request?.number;
     }
     else if (github_1.context.eventName === 'push') {
         eventInfo.commitSha = github_1.context.payload.after;
@@ -586,7 +613,22 @@ const main = async () => {
                 : [],
             junit: eventInfo.showJunit ? await (0, junit_1.parse)(eventInfo.junitPath) : undefined,
         };
-        const changedFile = await (0, changedFiles_1.getChangedFiles)(eventInfo);
+        let changedFile = {
+            all: [],
+            added: [],
+            removed: [],
+            modified: [],
+            renamed: [],
+            copied: [],
+            changed: [],
+            unchanged: [],
+        };
+        try {
+            changedFile = await (0, changedFiles_1.getChangedFiles)(eventInfo);
+        }
+        catch (error) {
+            core.warning(`Failed to get changed files: ${error instanceof Error ? error.message : String(error)}`);
+        }
         const diffInfo = await (0, diffCover_1.diffCover)(eventInfo, changedFile, coverageInfo);
         await (0, commentCoverage_1.commentCoverage)(eventInfo, (0, commentCoverage_1.buildBody)(eventInfo, coverageInfo.junit, diffInfo));
     }

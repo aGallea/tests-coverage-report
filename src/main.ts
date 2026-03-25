@@ -1,5 +1,5 @@
 import { getChangedFiles } from './changedFiles';
-import { CoverageTypeInfo, DiffInfo, EventInfo } from './types';
+import { CoverageTypeInfo, DiffInfo, EventInfo, FilesStatus } from './types';
 import { getEventInfo } from './eventInfo';
 import { diffCover } from './diffCover';
 import { parseFile as parseLcovFile } from './parsers/lcov';
@@ -30,7 +30,23 @@ export const main = async (): Promise<void> => {
           : [],
       junit: eventInfo.showJunit ? await parseJunit(eventInfo.junitPath) : undefined,
     };
-    const changedFile = await getChangedFiles(eventInfo);
+    let changedFile: FilesStatus = {
+      all: [],
+      added: [],
+      removed: [],
+      modified: [],
+      renamed: [],
+      copied: [],
+      changed: [],
+      unchanged: [],
+    };
+    try {
+      changedFile = await getChangedFiles(eventInfo);
+    } catch (error) {
+      core.warning(
+        `Failed to get changed files: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
 
     const diffInfo: DiffInfo[] = await diffCover(eventInfo, changedFile, coverageInfo);
     await commentCoverage(eventInfo, buildBody(eventInfo, coverageInfo.junit, diffInfo));

@@ -85,21 +85,17 @@ describe('eventInput tests', () => {
       filename: `page2-${i}.file`,
     }));
 
-    const mockCompare = jest
+    const mockListFiles = jest
       .fn()
-      .mockResolvedValueOnce({
-        data: { total_commits: 1, files: page1Files },
-      })
-      .mockResolvedValueOnce({
-        data: { total_commits: 1, files: page2Files },
-      });
+      .mockResolvedValueOnce({ data: page1Files })
+      .mockResolvedValueOnce({ data: page2Files });
 
     jest.spyOn(github, 'getOctokit').mockImplementation(
       () =>
         ({
           rest: {
-            repos: {
-              compareCommitsWithBasehead: mockCompare,
+            pulls: {
+              listFiles: mockListFiles,
             },
           },
         }) as any,
@@ -111,16 +107,43 @@ describe('eventInput tests', () => {
     expect(filesStatus.all).toHaveLength(60);
     expect(filesStatus.added).toHaveLength(50);
     expect(filesStatus.modified).toHaveLength(10);
-    expect(mockCompare).toHaveBeenCalledTimes(2);
+    expect(mockListFiles).toHaveBeenCalledTimes(2);
   });
 
   test('getChangedFiles skips files with unknown status', async () => {
+    const mockListFiles = jest.fn().mockResolvedValueOnce({
+      data: [
+        { status: 'added', filename: 'known.file' },
+        { status: 'unknown_status', filename: 'unknown.file' },
+      ],
+    });
+
+    jest.spyOn(github, 'getOctokit').mockImplementation(
+      () =>
+        ({
+          rest: {
+            pulls: {
+              listFiles: mockListFiles,
+            },
+          },
+        }) as any,
+    );
+
+    const eventInfo: EventInfo = getEventInfo();
+    const filesStatus: FilesStatus = await getChangedFiles(eventInfo);
+
+    expect(filesStatus.all).toHaveLength(2);
+    expect(filesStatus.added).toHaveLength(1);
+    expect(filesStatus.added[0]).toEqual('known.file');
+  });
+
+  test('getChangedFiles falls back to compareCommitsWithBasehead for push events', async () => {
     const mockCompare = jest.fn().mockResolvedValueOnce({
       data: {
         total_commits: 1,
         files: [
-          { status: 'added', filename: 'known.file' },
-          { status: 'unknown_status', filename: 'unknown.file' },
+          { status: 'added', filename: 'push.file' },
+          { status: 'modified', filename: 'push2.file' },
         ],
       },
     });
@@ -137,14 +160,60 @@ describe('eventInput tests', () => {
     );
 
     const eventInfo: EventInfo = getEventInfo();
+    // Simulate push event: no prNumber but baseRef/headRef set
+    eventInfo.prNumber = undefined;
+    eventInfo.baseRef = 'main';
+    eventInfo.headRef = 'some-branch';
     const filesStatus: FilesStatus = await getChangedFiles(eventInfo);
 
     expect(filesStatus.all).toHaveLength(2);
     expect(filesStatus.added).toHaveLength(1);
-    expect(filesStatus.added[0]).toEqual('known.file');
+    expect(filesStatus.added[0]).toEqual('push.file');
+    expect(filesStatus.modified).toHaveLength(1);
+    expect(mockCompare).toHaveBeenCalledWith(
+      expect.objectContaining({
+        basehead: 'main...some-branch',
+      }),
+    );
   });
 
-  test('getChangedFiles handles empty files response', async () => {
+  test('getChangedFiles compareCommitsWithBasehead paginates correctly', async () => {
+    const page1Files = Array.from({ length: 50 }, (_, i) => ({
+      status: 'added',
+      filename: `cmp-page1-${i}.file`,
+    }));
+    const page2Files = Array.from({ length: 5 }, (_, i) => ({
+      status: 'modified',
+      filename: `cmp-page2-${i}.file`,
+    }));
+
+    const mockCompare = jest
+      .fn()
+      .mockResolvedValueOnce({ data: { total_commits: 1, files: page1Files } })
+      .mockResolvedValueOnce({ data: { total_commits: 1, files: page2Files } });
+
+    jest.spyOn(github, 'getOctokit').mockImplementation(
+      () =>
+        ({
+          rest: {
+            repos: {
+              compareCommitsWithBasehead: mockCompare,
+            },
+          },
+        }) as any,
+    );
+
+    const eventInfo: EventInfo = getEventInfo();
+    eventInfo.prNumber = undefined;
+    eventInfo.baseRef = 'main';
+    eventInfo.headRef = 'feature';
+    const filesStatus: FilesStatus = await getChangedFiles(eventInfo);
+
+    expect(filesStatus.all).toHaveLength(55);
+    expect(mockCompare).toHaveBeenCalledTimes(2);
+  });
+
+  test('getChangedFiles compareCommitsWithBasehead handles undefined files', async () => {
     const mockCompare = jest.fn().mockResolvedValueOnce({
       data: { total_commits: 0, files: undefined },
     });
@@ -155,6 +224,41 @@ describe('eventInput tests', () => {
           rest: {
             repos: {
               compareCommitsWithBasehead: mockCompare,
+            },
+          },
+        }) as any,
+    );
+
+    const eventInfo: EventInfo = getEventInfo();
+    eventInfo.prNumber = undefined;
+    eventInfo.baseRef = 'main';
+    eventInfo.headRef = 'feature';
+    const filesStatus: FilesStatus = await getChangedFiles(eventInfo);
+
+    expect(filesStatus.all).toHaveLength(0);
+  });
+
+  test('getChangedFiles returns empty when no prNumber and no refs', async () => {
+    const eventInfo: EventInfo = getEventInfo();
+    eventInfo.prNumber = undefined;
+    eventInfo.baseRef = '';
+    eventInfo.headRef = '';
+    const filesStatus: FilesStatus = await getChangedFiles(eventInfo);
+
+    expect(filesStatus.all).toHaveLength(0);
+  });
+
+  test('getChangedFiles handles empty files response', async () => {
+    const mockListFiles = jest.fn().mockResolvedValueOnce({
+      data: [],
+    });
+
+    jest.spyOn(github, 'getOctokit').mockImplementation(
+      () =>
+        ({
+          rest: {
+            pulls: {
+              listFiles: mockListFiles,
             },
           },
         }) as any,
