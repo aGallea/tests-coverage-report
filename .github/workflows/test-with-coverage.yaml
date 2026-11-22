@@ -7,6 +7,10 @@ concurrency:
 on:
   workflow_dispatch: null
   pull_request: null
+# Declared explicitly: Dependabot-triggered runs get a read-only token otherwise.
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
   tests-with-coverage:
     timeout-minutes: 5
