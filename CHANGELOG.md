@@ -5,6 +5,12 @@
 
   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.15](https://github.com/aGallea/tests-coverage-report/compare/1.3.14...1.3.15) (2026-11-23)
+
+### Bug Fixes
+
+* **deps:** bump fast-xml-parser from 5.3.6 to 5.12.0 ([#82](https://github.com/aGallea/tests-coverage-report/issues/82)) ([6d66683](https://github.com/aGallea/tests-coverage-report/commit/6d666833ede73f75673c85c6e8486d40d1ff5760))
+
 ## [1.3.14](https://github.com/aGallea/tests-coverage-report/compare/1.3.13...1.3.14) (2026-03-25)
 
 ### Bug Fixes
