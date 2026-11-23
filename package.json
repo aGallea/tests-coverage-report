@@ -71,6 +71,6 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^6.0.1",
-    "fast-xml-parser": "^5.3.6"
+    "fast-xml-parser": "^5.12.0"
   }
 }

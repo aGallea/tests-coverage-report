@@ -12,8 +12,8 @@ const baseOptions = {
 export const createXmlParser = (arrayPaths: string[]): XMLParser => {
   return new XMLParser({
     ...baseOptions,
-    isArray: (_tagName: string, jPath: string) => {
-      return arrayPaths.some((path) => jPath.endsWith(path));
+    isArray: (_tagName, jPath) => {
+      return arrayPaths.some((path) => jPath.toString().endsWith(path));
     },
   });
 };
